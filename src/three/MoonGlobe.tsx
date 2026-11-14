@@ -246,14 +246,15 @@ export const MoonGlobe: React.FC = () => {
     const container = containerRef.current;
     if (!container) return;
 
-    const probe = document.createElement('canvas').getContext('webgl2');
+    const probe = document.createElement("canvas").getContext("webgl2");
     let isSoftwareGl = true;
     if (probe) {
-      const ext = probe.getExtension('WEBGL_debug_renderer_info');
+      const ext = probe.getExtension("WEBGL_debug_renderer_info");
       const param = ext ? ext.UNMASKED_RENDERER_WEBGL : probe.RENDERER;
       const gpu = String(probe.getParameter(param));
-      probe.getExtension('WEBGL_lose_context')?.loseContext();
-      isSoftwareGl = /SwiftShader|llvmpipe|softpipe|Software|Basic Render/i.test(gpu);
+      probe.getExtension("WEBGL_lose_context")?.loseContext();
+      isSoftwareGl =
+        /SwiftShader|llvmpipe|softpipe|Software|Basic Render/i.test(gpu);
     }
 
     let renderer: THREE.WebGLRenderer;
@@ -261,7 +262,7 @@ export const MoonGlobe: React.FC = () => {
       renderer = new THREE.WebGLRenderer({
         antialias: !isSoftwareGl,
         alpha: false,
-        powerPreference: 'high-performance',
+        powerPreference: "high-performance",
       });
     } catch {
       return;
@@ -270,7 +271,9 @@ export const MoonGlobe: React.FC = () => {
     const width = container.clientWidth || window.innerWidth || 1280;
     const height = container.clientHeight || window.innerHeight || 720;
 
-    renderer.setPixelRatio(isSoftwareGl ? 1 : Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(
+      isSoftwareGl ? 1 : Math.min(window.devicePixelRatio || 1, 2),
+    );
     renderer.setSize(width, height);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -302,7 +305,7 @@ export const MoonGlobe: React.FC = () => {
     const moonGeo = new THREE.SphereGeometry(
       1.48,
       isSoftwareGl ? 40 : 64,
-      isSoftwareGl ? 28 : 48
+      isSoftwareGl ? 28 : 48,
     );
     const moonMat = new THREE.MeshStandardMaterial({
       map: albedo,
@@ -358,3 +361,276 @@ export const MoonGlobe: React.FC = () => {
     landingRing.position.set(0.16, -1.48, 0.22);
     landingRing.lookAt(0.32, -2.96, 0.44);
     moonMesh.add(landingRing);
+
+    const orbitPivot = new THREE.Group();
+    orbitPivot.rotation.z = THREE.MathUtils.degToRad(24);
+    orbitPivot.rotation.x = THREE.MathUtils.degToRad(16);
+    heroStage.add(orbitPivot);
+
+    const orbitRingGeo = new THREE.TorusGeometry(2.02, 0.008, 8, 110);
+    const orbitRingMat = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.34,
+    });
+    const orbitRing = new THREE.Mesh(orbitRingGeo, orbitRingMat);
+    orbitRing.rotation.x = Math.PI / 2;
+    orbitPivot.add(orbitRing);
+
+    const outerRingGeo = new THREE.TorusGeometry(2.38, 0.004, 8, 110);
+    const outerRingMat = new THREE.MeshBasicMaterial({
+      color: 0xfbbf24,
+      transparent: true,
+      opacity: 0.16,
+    });
+    const outerRing = new THREE.Mesh(outerRingGeo, outerRingMat);
+    outerRing.rotation.x = Math.PI / 2 + 0.35;
+    outerRing.rotation.y = 0.45;
+    heroStage.add(outerRing);
+
+    const satellite = createGatewaySatellite();
+    orbitPivot.add(satellite.group);
+
+    // Distant Blue Earth in deep space background
+    const earthTex = createEarthTexture(maxAniso);
+    const earthGeo = new THREE.SphereGeometry(0.46, 32, 24);
+    const earthMat = new THREE.MeshStandardMaterial({
+      map: earthTex,
+      roughness: 0.55,
+      metalness: 0.05,
+      emissive: 0x075985,
+      emissiveIntensity: 0.3,
+    });
+    const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+    earthMesh.position.set(-2.9, 2.05, -8.5);
+    scene.add(earthMesh);
+
+    const earthGlowGeo = new THREE.SphereGeometry(0.51, 24, 18);
+    const earthGlowMat = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.18,
+      side: THREE.BackSide,
+      depthWrite: false,
+    });
+    const earthGlow = new THREE.Mesh(earthGlowGeo, earthGlowMat);
+    earthMesh.add(earthGlow);
+
+    // Dense 3D Starfield via InstancedMesh
+    const starCount = 280;
+    const starGeo = new THREE.SphereGeometry(0.022, 6, 6);
+    const starMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
+    const starInstances = new THREE.InstancedMesh(starGeo, starMat, starCount);
+    const dummy = new THREE.Object3D();
+    let s = 4242;
+    const srand = () => {
+      s = (s * 16807) % 2147483647;
+      return (s - 1) / 2147483646;
+    };
+    for (let i = 0; i < starCount; i++) {
+      const r = 8 + srand() * 18;
+      const theta = srand() * Math.PI * 2;
+      const phi = Math.acos(2 * srand() - 1);
+      dummy.position.set(
+        r * Math.sin(phi) * Math.cos(theta),
+        r * Math.sin(phi) * Math.sin(theta),
+        r * Math.cos(phi) - 6,
+      );
+      const scale = 0.4 + srand() * 1.25;
+      dummy.scale.setScalar(scale);
+      dummy.updateMatrix();
+      starInstances.setMatrixAt(i, dummy.matrix);
+    }
+    starInstances.instanceMatrix.needsUpdate = true;
+    starInstances.computeBoundingSphere();
+    scene.add(starInstances);
+
+    // Three-point warm solar / cool earthshine lighting
+    const sunKey = new THREE.DirectionalLight(0xfff4df, 2.75);
+    sunKey.position.set(5.2, 2.4, 3.8);
+    scene.add(sunKey);
+
+    const earthRim = new THREE.DirectionalLight(0x38bdf8, 0.85);
+    earthRim.position.set(-4.5, -1.8, -2.5);
+    scene.add(earthRim);
+
+    const hemi = new THREE.HemisphereLight(0x93c5fd, 0x050914, 0.38);
+    scene.add(hemi);
+
+    // Smooth interactive pointer parallax
+    let targetMouseX = 0;
+    let targetMouseY = 0;
+    const handlePointerMove = (e: PointerEvent) => {
+      targetMouseX = (e.clientX / Math.max(1, window.innerWidth) - 0.5) * 2;
+      targetMouseY = (e.clientY / Math.max(1, window.innerHeight) - 0.5) * 2;
+    };
+    window.addEventListener("pointermove", handlePointerMove);
+
+    const handleContextLost = (ev: Event) => {
+      ev.preventDefault();
+    };
+    renderer.domElement.addEventListener("webglcontextlost", handleContextLost);
+
+    const reducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+    let disposed = false;
+    let frameId = 0;
+
+    function afterDraw(cb: () => void) {
+      if (disposed) return;
+      const gl = renderer.getContext() as WebGL2RenderingContext;
+      const sync = gl.fenceSync?.(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+      gl.flush();
+      if (!sync) {
+        frameId = window.setTimeout(cb, 80);
+        return;
+      }
+      const poll = () => {
+        if (disposed) {
+          gl.deleteSync(sync);
+          return;
+        }
+        const state = gl.getSyncParameter(sync, gl.SYNC_STATUS);
+        if (state === gl.UNSIGNALED) {
+          frameId = window.setTimeout(poll, 5);
+        } else {
+          gl.deleteSync(sync);
+          frameId = window.setTimeout(cb, 80);
+        }
+      };
+      frameId = window.setTimeout(poll, 5);
+    }
+
+    let last = performance.now();
+    let elapsed = 0;
+
+    function tick() {
+      if (disposed) return;
+      const now = performance.now();
+      const dt = Math.min(0.1, (now - last) / 1000);
+      last = now;
+      elapsed += dt;
+
+      // Responsive desktop offset so Moon anchors cleanly on the right beside the hero brief
+      const isWide = (container?.clientWidth || window.innerWidth) >= 1024;
+      const goalX = isWide ? 1.38 : 0;
+      const goalY = isWide ? 0.08 : -0.78;
+      const goalScale = isWide ? 1.0 : 0.72;
+
+      heroStage.position.x = THREE.MathUtils.damp(
+        heroStage.position.x,
+        goalX + (reducedMotion ? 0 : targetMouseX * 0.14),
+        4,
+        dt,
+      );
+      heroStage.position.y = THREE.MathUtils.damp(
+        heroStage.position.y,
+        goalY - (reducedMotion ? 0 : targetMouseY * 0.1),
+        4,
+        dt,
+      );
+      heroStage.scale.setScalar(
+        THREE.MathUtils.damp(heroStage.scale.x, goalScale, 6, dt),
+      );
+
+      if (!reducedMotion) {
+        moonMesh.rotation.y += dt * 0.16;
+        earthMesh.rotation.y += dt * 0.08;
+        starInstances.rotation.y -= dt * 0.012;
+        outerRing.rotation.z += dt * 0.06;
+
+        // Gateway satellite orbits smoothly around the Moon
+        const orbitAngle = elapsed * 0.65;
+        satellite.group.position.set(
+          Math.cos(orbitAngle) * 2.02,
+          0,
+          Math.sin(orbitAngle) * 2.02,
+        );
+        satellite.group.rotation.y = -orbitAngle + Math.PI / 2;
+
+        // South Pole beacon ring gentle breathing
+        const pulse = 1 + Math.sin(elapsed * 3.2) * 0.2;
+        landingRing.scale.setScalar(pulse);
+        ringMat.opacity = 0.55 + Math.sin(elapsed * 3.2) * 0.35;
+        beamMat.opacity = 0.26 + Math.sin(elapsed * 3.2) * 0.16;
+      }
+
+      renderer.render(scene, camera);
+      if (isSoftwareGl) {
+        afterDraw(tick);
+      } else {
+        frameId = window.requestAnimationFrame(tick);
+      }
+    }
+
+    tick();
+
+    const handleResize = () => {
+      if (!container || disposed) return;
+      const w = container.clientWidth || window.innerWidth || 1280;
+      const h = container.clientHeight || window.innerHeight || 720;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    };
+
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(handleResize)
+        : null;
+    resizeObserver?.observe(container);
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      disposed = true;
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("resize", handleResize);
+      resizeObserver?.disconnect();
+      renderer.domElement.removeEventListener(
+        "webglcontextlost",
+        handleContextLost,
+      );
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(frameId);
+      moonGeo.dispose();
+      moonMat.dispose();
+      haloGeo.dispose();
+      haloMat.dispose();
+      beaconGeo.dispose();
+      beaconMat.dispose();
+      beamGeo.dispose();
+      beamMat.dispose();
+      ringGeo.dispose();
+      ringMat.dispose();
+      orbitRingGeo.dispose();
+      orbitRingMat.dispose();
+      outerRingGeo.dispose();
+      outerRingMat.dispose();
+      earthGeo.dispose();
+      earthMat.dispose();
+      earthGlowGeo.dispose();
+      earthGlowMat.dispose();
+      earthTex.dispose();
+      starGeo.dispose();
+      starMat.dispose();
+      satellite.dispose();
+      albedo.dispose();
+      bump.dispose();
+      envTarget.dispose();
+      renderer.dispose();
+      if (renderer.domElement.parentNode === container) {
+        container.removeChild(renderer.domElement);
+      }
+    };
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className="w-full h-full relative select-none overflow-hidden"
+      aria-label="Full-screen 3D Moon with orbiting Gateway satellite, distant Earth, and Shackleton Crater beacon"
+    />
+  );
+};
