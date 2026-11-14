@@ -202,3 +202,93 @@ function createGatewaySatellite(): {
   });
   const wings = new THREE.Mesh(wingGeo, wingMat);
   group.add(wings);
+
+  const dishGeo = new THREE.ConeGeometry(0.04, 0.03, 12, 1, true);
+  const dishMat = new THREE.MeshStandardMaterial({
+    color: 0xf8fafc,
+    metalness: 0.5,
+    roughness: 0.3,
+    side: THREE.DoubleSide,
+  });
+  const dish = new THREE.Mesh(dishGeo, dishMat);
+  dish.position.set(0.11, 0.025, 0);
+  dish.rotation.z = -Math.PI / 2;
+  group.add(dish);
+
+  // Thruster glow
+  const thrustGeo = new THREE.SphereGeometry(0.024, 8, 8);
+  const thrustMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+  const thruster = new THREE.Mesh(thrustGeo, thrustMat);
+  thruster.position.set(-0.115, 0, 0);
+  group.add(thruster);
+
+  return {
+    group,
+    dispose: () => {
+      hullGeo.dispose();
+      hullMat.dispose();
+      goldGeo.dispose();
+      goldMat.dispose();
+      wingGeo.dispose();
+      wingMat.dispose();
+      dishGeo.dispose();
+      dishMat.dispose();
+      thrustGeo.dispose();
+      thrustMat.dispose();
+    },
+  };
+}
+
+export const MoonGlobe: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const probe = document.createElement('canvas').getContext('webgl2');
+    let isSoftwareGl = true;
+    if (probe) {
+      const ext = probe.getExtension('WEBGL_debug_renderer_info');
+      const param = ext ? ext.UNMASKED_RENDERER_WEBGL : probe.RENDERER;
+      const gpu = String(probe.getParameter(param));
+      probe.getExtension('WEBGL_lose_context')?.loseContext();
+      isSoftwareGl = /SwiftShader|llvmpipe|softpipe|Software|Basic Render/i.test(gpu);
+    }
+
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        antialias: !isSoftwareGl,
+        alpha: false,
+        powerPreference: 'high-performance',
+      });
+    } catch {
+      return;
+    }
+
+    const width = container.clientWidth || window.innerWidth || 1280;
+    const height = container.clientHeight || window.innerHeight || 720;
+
+    renderer.setPixelRatio(isSoftwareGl ? 1 : Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(width, height);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.12;
+    renderer.setClearColor(0x050914, 1);
+
+    container.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x050914);
+    scene.fog = new THREE.FogExp2(0x050914, 0.025);
+
+    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
+    camera.position.set(0, 0.15, 5.2);
+
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const roomEnv = new RoomEnvironment();
+    const envTarget = pmrem.fromScene(roomEnv, 0.04);
+    scene.environment = envTarget.texture;
+    roomEnv.dispose();
+    pmrem.dispose();
