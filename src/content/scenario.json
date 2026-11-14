@@ -1,1 +1,590 @@
-{}
+{
+  "meta": {
+    "title": "Silica Station",
+    "subtitle": {
+      "short": "Keep your Moon crew alive for 12 rounds.",
+      "detail": "You are the Mission Commander at Shackleton Crater on the Moon's South Pole. Every button shows what you lose right away, and what comes back 3 rounds later."
+    },
+    "location": {
+      "short": "Moon South Pole · Shackleton Rim",
+      "detail": "Shackleton Crater sits near the lunar south pole, where crater rims catch long sunlight while dark crater floors trap ancient water ice."
+    },
+    "moonDirtNote": {
+      "short": "Scientists call moon dirt 'regolith'.",
+      "detail": "Lunar regolith is crushed rock and dust covering the Moon. It contains trapped oxygen atoms in silicate minerals and can be piled up as thick walls to block space radiation."
+    },
+    "powerAtZeroRule": {
+      "short": "Power at 0 stops air machines (-15 extra oxygen).",
+      "detail": "Life-support fans and oxygen scrubbers need electricity to run. If station power hits 0, the crew loses an extra 15 oxygen every round until power is restored."
+    },
+    "darkPeriodNote": "Note: The 14-day lunar night is simplified to 5 night rounds (Rounds 5–9) so students can complete a full mission in ~8 minutes."
+  },
+  "chapters": [
+    {
+      "id": 1,
+      "title": "Establish the Station",
+      "rounds": "Rounds 1–3",
+      "summary": "Turn on station systems, manage batteries, and divide your moon dirt."
+    },
+    {
+      "id": 2,
+      "title": "Prepare for Lunar Night",
+      "rounds": "Rounds 4–6",
+      "summary": "Get ready before darkness cuts off solar power and supply ships fall behind."
+    },
+    {
+      "id": 3,
+      "title": "Survive the Crisis",
+      "rounds": "Rounds 7–9",
+      "summary": "Weather the dark period, fix shortages, and shield the crew from a solar flare."
+    },
+    {
+      "id": 4,
+      "title": "Recover and Complete Mission",
+      "rounds": "Rounds 10–12",
+      "summary": "Bring solar power back online, steady the crew, and reach the resupply ship."
+    }
+  ],
+  "warnings": {
+    "night_soon": {
+      "short": "Dark night starts in 2 rounds! Solar power stops.",
+      "detail": "During lunar night, solar panels produce 0 power. Save battery power before Round 5 begins."
+    },
+    "delay_soon": {
+      "short": "Supply ship is late! Arrives 2 rounds behind.",
+      "detail": "The Earth cargo rocket had a launch delay. You will need to stretch your food or emergency air in Round 6."
+    },
+    "flare_soon": {
+      "short": "Solar flare hits in 2 rounds! Check your shield.",
+      "detail": "A burst of high-energy solar particles is racing toward the Moon. Moon dirt shielding and shelter power will cut the radiation damage in Round 8."
+    },
+    "leak_soon": {
+      "short": "Small air leak detected! Fix it before it grows.",
+      "detail": "A tiny seal on the airlock is hissing. Patching it early costs a little moon dirt, while ignoring it costs much more oxygen later."
+    }
+  },
+  "events": {
+    "moon_dirt": {
+      "title": {
+        "short": "Choose how to use Moon Dirt",
+        "detail": "You have a limited pile of lunar regolith (moon dirt). Pick ONE job for 15 units of moon dirt—the other two jobs will have to wait. The result arrives in 3 rounds."
+      },
+      "situation": {
+        "short": "15 moon dirt can make Air, Shield, or Batteries.",
+        "detail": "Every choice uses 15 moon dirt right away and delivers its reward three rounds later. Think ahead about what danger is coming next!"
+      },
+      "choices": [
+        {
+          "id": "dirt_air",
+          "icon": "air",
+          "label": {
+            "short": "Turn moon dirt into Air",
+            "detail": "Bake lunar regolith to release trapped oxygen for the crew."
+          },
+          "costLabel": "Costs 15 moon dirt now",
+          "why": {
+            "short": "Gives +36 oxygen in 3 rounds.",
+            "detail": "Lunar soil is roughly 40% oxygen by weight, locked in rock minerals. Baking it gives the crew +36 oxygen 3 rounds later—vital because you start with 85 oxygen and 12 rounds burn 144!"
+          },
+          "immediate": { "moonDirt": -15 },
+          "delayed": { "oxygen": 36 },
+          "delayedReason": {
+            "short": "Moon dirt became +36 oxygen, so the crew can breathe longer.",
+            "detail": "Oxygen extraction finished! +36 oxygen was pumped into the station's air tanks."
+          },
+          "teaches": "Moon dirt can be baked into breathable oxygen, but it uses soil needed for shielding."
+        },
+        {
+          "id": "dirt_shield",
+          "icon": "shield",
+          "label": {
+            "short": "Stack moon dirt as Shield",
+            "detail": "Pile lunar regolith over the habitat roof to block solar radiation."
+          },
+          "costLabel": "Costs 15 moon dirt now",
+          "why": {
+            "short": "Adds +15 shield in 3 rounds (max 30 counts).",
+            "detail": "The Moon has no thick air or magnetic field to stop solar storms. Piling moon dirt adds +15 shield in 3 rounds. Note: Only 30 shield points count against a flare, so a 3rd shield pick is wasted!"
+          },
+          "immediate": { "moonDirt": -15 },
+          "delayed": { "shield": 15 },
+          "delayedReason": {
+            "short": "Moon dirt in the shield blocks radiation, like a thick wall.",
+            "detail": "Regolith shielding layer completed! +15 radiation shield added to the habitat roof."
+          },
+          "teaches": "Thick moon dirt blocks space radiation, up to the station's 30-point cap."
+        },
+        {
+          "id": "dirt_build",
+          "icon": "build",
+          "label": {
+            "short": "Build a new Battery Box",
+            "detail": "Sinter moon dirt into bricks for an extra battery bay."
+          },
+          "costLabel": "Costs 15 moon dirt now",
+          "why": {
+            "short": "Gives +15 power and +15 max battery in 3 rounds.",
+            "detail": "Building a larger battery bay increases your station's power storage limit from 100 to 115 and delivers +15 power in 3 rounds to survive the dark night."
+          },
+          "immediate": { "moonDirt": -15 },
+          "delayed": { "power": 15, "powerCap": 15 },
+          "delayedReason": {
+            "short": "New battery box built: +15 power and +15 battery cap.",
+            "detail": "Construction finished! Your maximum battery storage grew by 15 and gained +15 stored power."
+          },
+          "teaches": "Expanding battery capacity prepares the station for long periods without sunlight."
+        }
+      ]
+    },
+    "heating": {
+      "title": {
+        "short": "Check Station Heating",
+        "detail": "Lunar temperatures plunge below -130°C in shadows. Keeping the cabin warm uses power right now, while turning heaters off risks crew illness 3 rounds later."
+      },
+      "situation": {
+        "short": "Keep heaters ON, or save power by turning OFF?",
+        "detail": "Keeping heaters ON costs 15 power immediately. Turning them OFF saves power right now, but cold air makes an astronaut sick three rounds later (-18 health, -6 O₂) and drains -5 health & -6 O₂ every round while sick."
+      },
+      "choices": [
+        {
+          "id": "heat_on",
+          "icon": "heater",
+          "label": {
+            "short": "Keep Heating ON",
+            "detail": "Run cabin heaters to keep the crew warm and healthy."
+          },
+          "costLabel": "Costs 15 power now",
+          "why": {
+            "short": "Safe temperature—no sickness in 3 rounds.",
+            "detail": "Prevention is cheaper than a cure! Spending 15 power now keeps cabin air warm so nobody gets sick later."
+          },
+          "immediate": { "power": -15 },
+          "delayed": {},
+          "delayedReason": {
+            "short": "The heating stayed on, so the crew stayed warm.",
+            "detail": "Stable cabin temperatures kept all astronauts healthy with zero cold stress."
+          },
+          "teaches": "Keeping life support heaters running protects crew health."
+        },
+        {
+          "id": "heat_off",
+          "icon": "moon",
+          "label": {
+            "short": "Switch Heating OFF",
+            "detail": "Shut down cabin heaters to save battery power right now."
+          },
+          "costLabel": "Free now · -18 health & -6 O₂ in 3 rounds",
+          "why": {
+            "short": "Saves power now, but -18 health & sickness (-5 health/rd) later.",
+            "detail": "Switching heating OFF freezes air scrubbers (-6 oxygen), makes an astronaut sick (-18 health, plus -5 health & -6 oxygen/rd while untreated), and treating them later costs 25 power and 10 moon dirt!"
+          },
+          "immediate": {},
+          "delayed": { "health": -18, "oxygen": -6, "sick": true },
+          "delayedReason": {
+            "short": "The heating was off: someone got sick (-18 health, -6 O₂).",
+            "detail": "Freezing cabin air chilled the crew (-18 health) and iced up scrubber vents (-6 oxygen). Untreated illness drains -5 health and -6 oxygen every round!"
+          },
+          "teaches": "Skipping heating saves power today but causes costly illness, health loss, and oxygen loss later."
+        }
+      ]
+    },
+    "clean_panels": {
+      "title": {
+        "short": "Lunar Dust on Solar Panels",
+        "detail": "Tiny sharp grains of lunar dust stick to solar panels like static cling, blocking sunlight if not brushed off."
+      },
+      "situation": {
+        "short": "Clean the dusty solar panels, or skip it?",
+        "detail": "Electrostatic lunar dust coats the solar wings. Sending the wiper arm costs 5 power now, while skipping cleaning cuts solar power by 10/rd and loses 15 power in 3 rounds."
+      },
+      "choices": [
+        {
+          "id": "clean_skip",
+          "icon": "warning",
+          "label": {
+            "short": "Skip Panel Cleaning",
+            "detail": "Save power right now and leave the dust on the panels."
+          },
+          "costLabel": "Free now · -15 power & dusty solar later",
+          "why": {
+            "short": "Saves 5 power now, loses 15 power in 3 rounds + blocks sun.",
+            "detail": "Leaving dust on the panels blocks sunlight (-10 solar power on sunny rounds) and causes static buildup that drains 15 power in 3 rounds."
+          },
+          "immediate": {},
+          "delayed": { "power": -15 },
+          "delayedReason": {
+            "short": "Dust covered the solar panels (-15 power).",
+            "detail": "Thick lunar dust shaded the solar wings, draining 15 power from the station grid."
+          },
+          "teaches": "Skipping small maintenance causes bigger power losses later."
+        },
+        {
+          "id": "clean_yes",
+          "icon": "clean",
+          "label": {
+            "short": "Clean Solar Panels",
+            "detail": "Brush dust off the solar arrays so sunlight hits every cell."
+          },
+          "costLabel": "Costs 5 power now",
+          "why": {
+            "short": "Costs 5 power now to prevent -15 power & lost sunlight.",
+            "detail": "Lunar dust is jagged and electrically charged, so it clings tightly to glass. Cleaning takes just 5 power now and avoids losing 15 power and solar charging later."
+          },
+          "immediate": { "power": -5 },
+          "delayed": {},
+          "delayedReason": {
+            "short": "Clean panels kept solar electricity flowing strong.",
+            "detail": "Because the dust was brushed off early, the solar arrays run at full efficiency."
+          },
+          "teaches": "Lunar dust sticks to everything and blocks sunlight."
+        }
+      ]
+    },
+    "supply_delay": {
+      "title": {
+        "short": "Supply Ship Delayed!",
+        "detail": "The resupply rocket from Earth was delayed on the launchpad. You must stretch supplies right now."
+      },
+      "situation": {
+        "short": "Rocket is late! Eat less food, or tap emergency air?",
+        "detail": "Neither option costs anything today, because the shortage hits 3 rounds from now. Choose which reserve to stretch."
+      },
+      "choices": [
+        {
+          "id": "delay_air",
+          "icon": "oxygen",
+          "label": {
+            "short": "Use Emergency Air",
+            "detail": "Keep full meals for crew health, and burn backup air canisters."
+          },
+          "costLabel": "Free now · -25 oxygen in 3 rounds",
+          "why": {
+            "short": "Protects health, but costs 25 oxygen later.",
+            "detail": "Keeping meals normal keeps crew health steady, but using backup reserves drops oxygen by 25 three rounds later—risking oxygen depletion!"
+          },
+          "immediate": {},
+          "delayed": { "oxygen": -25 },
+          "delayedReason": {
+            "short": "The ship was late, so backup air ran down (-25 oxygen).",
+            "detail": "Emergency air tanks dropped (-25 oxygen) while waiting for the delayed rocket."
+          },
+          "teaches": "Emergency reserves keep the crew fed, but shrink your oxygen margin."
+        },
+        {
+          "id": "delay_eat_less",
+          "icon": "health",
+          "label": {
+            "short": "Eat Less Food",
+            "detail": "Ration astronaut meals so emergency oxygen tanks stay full."
+          },
+          "costLabel": "Free now · -18 health in 3 rounds",
+          "why": {
+            "short": "Protects oxygen, but crew loses 18 health later.",
+            "detail": "Cutting meal calories saves your emergency air canisters, but underfed astronauts lose strength and immune health (-18 health in 3 rounds)."
+          },
+          "immediate": {},
+          "delayed": { "health": -18 },
+          "delayedReason": {
+            "short": "The ship was late, so smaller meals lowered health (-18).",
+            "detail": "Rationing food stretched supplies until resupply, costing 18 crew health."
+          },
+          "teaches": "Supply delays force commanders to trade between crew health and oxygen."
+        },
+        {
+          "id": "delay_greenhouse",
+          "icon": "air",
+          "label": {
+            "short": "Grow Greenhouse Greens (CSA)",
+            "detail": "Power the hydroponic lunar farm to grow fresh food and recycle cabin air."
+          },
+          "costLabel": "Costs 5 power now · +32 O₂ & +6 health later",
+          "why": {
+            "short": "Trades 5 power now for +32 oxygen and +6 health in 3 rounds.",
+            "detail": "Inspired by the Canadian Space Agency's Lunar Food program: energy-saving LED plants turn carbon dioxide into +32 breathable oxygen while supplying fresh vitamins."
+          },
+          "immediate": { "power": -5 },
+          "delayed": { "oxygen": 32, "health": 6 },
+          "delayedReason": {
+            "short": "CSA Greenhouse crops boosted health (+6) and air (+32 oxygen)!",
+            "detail": "CSA-style Controlled Environment Agriculture produced fresh greens and recycled +32 oxygen for the crew."
+          },
+          "teaches": "Space greenhouses grow nutritious food while helping recycle breathable oxygen."
+        }
+      ]
+    },
+    "treat_sick": {
+      "title": {
+        "short": "Astronaut Is Sick!",
+        "detail": "One crew member caught an illness from the cold cabin earlier. Treating them now costs heavy power and moon dirt, while leaving them untreated keeps draining oxygen every round."
+      },
+      "situation": {
+        "short": "A crew member is sick! Treat now or let them rest?",
+        "detail": "Medical bay equipment needs 25 power and 10 moon dirt right away (+15 health). Leaving it untreated spreads illness (-20 health later) and keeps draining -5 health & -6 oxygen/rd."
+      },
+      "choices": [
+        {
+          "id": "treat_rest",
+          "icon": "warning",
+          "label": {
+            "short": "Let Them Rest",
+            "detail": "Save power and moon dirt, and hope the crew recovers on its own."
+          },
+          "costLabel": "Free now · -20 health & ongoing -5 health/rd",
+          "why": {
+            "short": "Saves supplies now, but illness worsens (-20 health + -5 health/rd).",
+            "detail": "Inside a sealed lunar cabin, germs spread through recycled air. Without treatment, crew health drops 20 points and loses another 5 health and 6 oxygen every round."
+          },
+          "immediate": {},
+          "delayed": { "health": -20, "sick": true },
+          "delayedReason": {
+            "short": "Untreated illness spread through the cabin (-20 health).",
+            "detail": "Without med-bay treatment, illness worsened (-20 health) and drained crew health and oxygen every round."
+          },
+          "teaches": "Untreated problems inside a closed habitat spread to the whole crew."
+        },
+        {
+          "id": "treat_now",
+          "icon": "treat",
+          "label": {
+            "short": "Treat Sick Astronaut",
+            "detail": "Run the med-bay purifier and heal the sick crew member."
+          },
+          "costLabel": "Costs 25 power & 10 moon dirt",
+          "why": {
+            "short": "Restores +15 health now, stops illness & extra O₂ drain.",
+            "detail": "Curing an illness on the Moon costs 25 power and 10 moon dirt—much more than keeping the heating on earlier!"
+          },
+          "immediate": { "power": -25, "moonDirt": -10, "health": 15, "sick": false },
+          "delayed": {},
+          "delayedReason": {
+            "short": "Early medical treatment cured the crew completely.",
+            "detail": "The med-bay cleared the infection and stopped the extra oxygen drain."
+          },
+          "teaches": "Prevention is much cheaper than curing sickness in space."
+        }
+      ]
+    },
+    "solar_flare": {
+      "title": {
+        "short": "SOLAR FLARE STRIKES NOW!",
+        "detail": "A storm of high-energy protons from the Sun is hitting Silica Station right now! Your Round 5 moon dirt choice lands first, then the flare strikes."
+      },
+      "situation": {
+        "short": "Radiation storm! Take shelter or keep working?",
+        "detail": "Using the shelter costs 20 power and cuts whatever flare damage gets past your shield in HALF. Keeping work going saves power, but takes full flare damage plus -5 health later."
+      },
+      "choices": [
+        {
+          "id": "flare_shelter",
+          "icon": "shelter",
+          "label": {
+            "short": "Take Shelter Inside",
+            "detail": "Move the whole crew into the shielded storm shelter."
+          },
+          "costLabel": "Costs 20 power now",
+          "why": {
+            "short": "Cuts flare damage in HALF! Safe in 3 rounds.",
+            "detail": "Running air scrubbers inside the tight storm bunker costs 20 power, but cuts remaining solar flare damage in half and avoids delayed radiation fatigue."
+          },
+          "immediate": { "power": -20, "flareHalf": true },
+          "delayed": {},
+          "delayedReason": {
+            "short": "Sheltering under moon dirt blocked the solar storm.",
+            "detail": "Because the crew stayed inside the shelter, they avoided delayed radiation sickness."
+          },
+          "teaches": "Taking shelter combines with moon dirt walls to protect astronauts from flares."
+        },
+        {
+          "id": "flare_work",
+          "icon": "flare",
+          "label": {
+            "short": "Keep Crew Working",
+            "detail": "Save 20 power and keep station tasks running during the storm."
+          },
+          "costLabel": "Free now · Full flare + -15 health later",
+          "why": {
+            "short": "Takes full flare damage now (up to -45), plus -15 health later.",
+            "detail": "Saves 20 power, but the crew absorbs full unshielded flare damage right now AND suffers -15 delayed radiation fatigue 3 rounds later."
+          },
+          "immediate": { "flareHalf": false },
+          "delayed": { "health": -15 },
+          "delayedReason": {
+            "short": "Solar flare work caused delayed radiation fatigue (-15 health).",
+            "detail": "High-energy particles caused tiredness and radiation sickness (-15 health)."
+          },
+          "teaches": "Working through a solar storm risks immediate and delayed radiation harm."
+        }
+      ]
+    },
+    "exercise": {
+      "title": {
+        "short": "Low-Gravity Exercise Time",
+        "detail": "The Moon has only 1/6th of Earth's gravity. Without daily exercise, astronaut bones and heart muscles quickly weaken."
+      },
+      "situation": {
+        "short": "Run exercise machines, or skip workout?",
+        "detail": "Powering the treadmill and resistance gear uses 10 power today. Skipping saves power now, but costs 10 health during the resupply check-up!"
+      },
+      "choices": [
+        {
+          "id": "exercise_skip",
+          "icon": "warning",
+          "label": {
+            "short": "Skip Exercise Today",
+            "detail": "Conserve 10 power and let the crew skip workouts."
+          },
+          "costLabel": "Free now · -10 health later",
+          "why": {
+            "short": "Saves 10 power now, costs 10 health in check-up.",
+            "detail": "Even in the final rounds, late shortcuts come back! Skipping exercise weakens the crew by -10 health before the final score."
+          },
+          "immediate": {},
+          "delayed": { "health": -10 },
+          "delayedReason": {
+            "short": "Skipping exercise weakened muscles in low gravity (-10 health).",
+            "detail": "Low Moon gravity drained crew strength (-10 health) during the final resupply check-up."
+          },
+          "teaches": "Even late mission shortcuts affect your final crew health."
+        },
+        {
+          "id": "exercise_yes",
+          "icon": "exercise",
+          "label": {
+            "short": "Run Daily Exercise",
+            "detail": "Keep crew muscles and bones strong in 1/6th Moon gravity."
+          },
+          "costLabel": "Costs 10 power now",
+          "why": {
+            "short": "Costs 10 power now, protects crew for resupply.",
+            "detail": "NASA astronauts exercise 2 hours every day in space so their bodies stay strong enough to handle landing back on Earth."
+          },
+          "immediate": { "power": -10 },
+          "delayed": {},
+          "delayedReason": {
+            "short": "Daily exercise kept crew muscles strong for landing.",
+            "detail": "Astronauts passed their final strength check when the resupply spacecraft docked."
+          },
+          "teaches": "Low gravity weakens bones and muscles without regular exercise."
+        }
+      ]
+    },
+    "dig_ice": {
+      "title": {
+        "short": "Rover Ice Hunt at Crater Edge",
+        "detail": "Cold shadows inside Shackleton Crater hold frozen water ice. Sending the rover costs power now, and splits ice into oxygen 3 rounds later."
+      },
+      "situation": {
+        "short": "Send the rover to dig lunar ice, or keep it docked?",
+        "detail": "Driving into the freezing crater shadow uses 20 power right away, but turns mined ice into +32 oxygen in 3 rounds."
+      },
+      "choices": [
+        {
+          "id": "ice_send",
+          "icon": "rover",
+          "label": {
+            "short": "Send Rover for Ice",
+            "detail": "Mine frozen water in crater shadows and split it into oxygen."
+          },
+          "costLabel": "Costs 20 power now",
+          "why": {
+            "short": "Gives +32 oxygen in 3 rounds!",
+            "detail": "NASA targets the Moon's South Pole because crater ice (H₂O) can be melted and split with electricity into +32 breathable oxygen!"
+          },
+          "immediate": { "power": -20 },
+          "delayed": { "oxygen": 32 },
+          "delayedReason": {
+            "short": "Crater ice was melted and split into +32 oxygen.",
+            "detail": "Rover returned with pure ice from Shackleton Crater, boosting oxygen by 32."
+          },
+          "teaches": "South Pole water ice can become drinking water and breathable air."
+        },
+        {
+          "id": "ice_stay",
+          "icon": "moon",
+          "label": {
+            "short": "Keep Rover Docked",
+            "detail": "Save 20 power and rely on your current oxygen tanks."
+          },
+          "costLabel": "Free now · No extra oxygen",
+          "why": {
+            "short": "Saves 20 power immediately.",
+            "detail": "If your oxygen is already safe and power is tight, keeping the rover docked protects your battery reserves."
+          },
+          "immediate": {},
+          "delayed": {},
+          "delayedReason": {
+            "short": "Rover stayed docked to preserve battery reserves.",
+            "detail": "Batteries stayed charged, though no extra crater ice was harvested."
+          },
+          "teaches": "Every expedition trades battery power for future supplies."
+        }
+      ]
+    },
+    "air_leak": {
+      "title": {
+        "short": "Airlock Seal Leak!",
+        "detail": "A tiny crack in the habitat seal is leaking air into the Moon's vacuum. Patching it now costs 5 moon dirt; ignoring it loses 18 oxygen in 3 rounds."
+      },
+      "situation": {
+        "short": "Patch the hissing air leak, or ignore it?",
+        "detail": "Mixing moon dirt sealant costs 5 moon dirt right now. Ignoring the leak saves dirt today, but loses 18 oxygen three rounds later."
+      },
+      "choices": [
+        {
+          "id": "leak_patch",
+          "icon": "build",
+          "label": {
+            "short": "Patch Air Leak Now",
+            "detail": "Seal the crack with moon dirt glue before air escapes."
+          },
+          "costLabel": "Costs 5 moon dirt now",
+          "why": {
+            "short": "Stops a -18 oxygen leak in 3 rounds.",
+            "detail": "Small problems grow fast in a vacuum! Spending 5 moon dirt now saves 18 breathable oxygen later."
+          },
+          "immediate": { "moonDirt": -5 },
+          "delayed": {},
+          "delayedReason": {
+            "short": "Patched airlock held tight with zero air lost.",
+            "detail": "The early seal repair stopped the leak completely."
+          },
+          "teaches": "Fixing small problems early saves vital resources later."
+        },
+        {
+          "id": "leak_ignore",
+          "icon": "warning",
+          "label": {
+            "short": "Ignore Small Leak",
+            "detail": "Save moon dirt now and let the airlock keep hissing."
+          },
+          "costLabel": "Free now · -18 oxygen in 3 rounds",
+          "why": {
+            "short": "Saves 5 dirt now, loses 18 oxygen in 3 rounds.",
+            "detail": "Pressure leaks widen over time. By 3 rounds from now, 18 oxygen will escape into space."
+          },
+          "immediate": {},
+          "delayed": { "oxygen": -18 },
+          "delayedReason": {
+            "short": "Unpatched air leak vented 18 oxygen into space.",
+            "detail": "The ignored crack grew wider and drained 18 oxygen from the cabin."
+          },
+          "teaches": "Small problems grow if ignored."
+        }
+      ]
+    }
+  },
+  "scheduledOutcomes": {
+    "flareHit": {
+      "short": "Solar flare struck the station!",
+      "detail": "Radiation hit the habitat. Your moon dirt shield and shelter cut down the damage."
+    },
+    "resupplyArrived": {
+      "short": "Resupply spacecraft docked safely!",
+      "detail": "Fresh oxygen, food, and replacement parts arrived from Earth. Final check-up complete!"
+    },
+    "powerZeroPenalty": {
+      "short": "Power hit 0! Air machines stopped (-15 extra oxygen).",
+      "detail": "Without electricity, life-support scrubbers shut down and oxygen fell by an extra 15."
+    }
+  }
+}
