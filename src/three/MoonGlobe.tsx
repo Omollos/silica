@@ -72,3 +72,55 @@ function createMoonTextures(maxAnisotropy: number): {
     }
     aCtx.restore();
   }
+
+  for (let i = 0; i < 260; i++) {
+    const x = rand() * width;
+    const y = rand() * height;
+    const r = 3 + rand() * 26;
+
+    const bGrad = bCtx.createRadialGradient(x, y, 0, x, y, r);
+    bGrad.addColorStop(0, '#2c2c2c');
+    bGrad.addColorStop(0.68, '#585858');
+    bGrad.addColorStop(0.88, '#dadada');
+    bGrad.addColorStop(1, 'rgba(128,128,128,0)');
+    bCtx.fillStyle = bGrad;
+    bCtx.beginPath();
+    bCtx.arc(x, y, r, 0, Math.PI * 2);
+    bCtx.fill();
+
+    const aGrad = aCtx.createRadialGradient(x, y, 0, x, y, r);
+    aGrad.addColorStop(0, 'rgba(54, 62, 78, 0.5)');
+    aGrad.addColorStop(0.84, 'rgba(220, 228, 240, 0.3)');
+    aGrad.addColorStop(1, 'rgba(154, 163, 178, 0)');
+    aCtx.fillStyle = aGrad;
+    aCtx.beginPath();
+    aCtx.arc(x, y, r, 0, Math.PI * 2);
+    aCtx.fill();
+  }
+
+  const albedo = new THREE.CanvasTexture(albedoCanvas);
+  albedo.colorSpace = THREE.SRGBColorSpace;
+  albedo.anisotropy = maxAnisotropy;
+  albedo.needsUpdate = true;
+
+  const bump = new THREE.CanvasTexture(bumpCanvas);
+  bump.anisotropy = maxAnisotropy;
+  bump.needsUpdate = true;
+
+  return { albedo, bump };
+}
+
+function createEarthTexture(maxAnisotropy: number): THREE.CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = 512;
+  c.height = 256;
+  const ctx = c.getContext('2d')!;
+
+  ctx.fillStyle = '#0c4a6e';
+  ctx.fillRect(0, 0, 512, 256);
+
+  const grad = ctx.createRadialGradient(210, 120, 20, 256, 128, 260);
+  grad.addColorStop(0, '#0284c7');
+  grad.addColorStop(1, '#082f49');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 512, 256);
