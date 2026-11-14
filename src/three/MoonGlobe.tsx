@@ -179,3 +179,26 @@ function createGatewaySatellite(): {
   const hull = new THREE.Mesh(hullGeo, hullMat);
   hull.rotation.z = Math.PI / 2;
   group.add(hull);
+
+   const goldGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.08, 12);
+  const goldMat = new THREE.MeshStandardMaterial({
+    color: 0xf59e0b,
+    metalness: 0.85,
+    roughness: 0.2,
+  });
+  const goldModule = new THREE.Mesh(goldGeo, goldMat);
+  goldModule.rotation.z = Math.PI / 2;
+  goldModule.position.x = -0.035;
+  group.add(goldModule);
+
+  // Twin Solar Wings
+  const wingGeo = new THREE.BoxGeometry(0.085, 0.01, 0.42);
+  const wingMat = new THREE.MeshStandardMaterial({
+    color: 0x0284c7,
+    metalness: 0.4,
+    roughness: 0.2,
+    emissive: 0x0ea5e9,
+    emissiveIntensity: 0.45,
+  });
+  const wings = new THREE.Mesh(wingGeo, wingMat);
+  group.add(wings);
