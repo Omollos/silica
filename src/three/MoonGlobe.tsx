@@ -31,3 +31,17 @@ function createMoonTextures(maxAnisotropy: number): {
     seed = (seed * 16807) % 2147483647;
     return (seed - 1) / 2147483646;
   };
+
+  for (let i = 0; i < 18; i++) {
+    const x = rand() * width;
+    const y = rand() * (height * 0.72) + height * 0.14;
+    const r = 45 + rand() * 98;
+    const grad = aCtx.createRadialGradient(x, y, r * 0.12, x, y, r);
+    grad.addColorStop(0, 'rgba(56, 65, 84, 0.62)');
+    grad.addColorStop(0.6, 'rgba(78, 88, 108, 0.32)');
+    grad.addColorStop(1, 'rgba(72, 80, 96, 0)');
+    aCtx.fillStyle = grad;
+    aCtx.beginPath();
+    aCtx.arc(x, y, r, 0, Math.PI * 2);
+    aCtx.fill();
+  }
