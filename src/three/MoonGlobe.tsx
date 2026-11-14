@@ -292,3 +292,39 @@ export const MoonGlobe: React.FC = () => {
     scene.environment = envTarget.texture;
     roomEnv.dispose();
     pmrem.dispose();
+
+    const heroStage = new THREE.Group();
+    scene.add(heroStage);
+
+    const maxAniso = renderer.capabilities.getMaxAnisotropy();
+    const { albedo, bump } = createMoonTextures(maxAniso);
+
+    const moonGeo = new THREE.SphereGeometry(
+      1.48,
+      isSoftwareGl ? 40 : 64,
+      isSoftwareGl ? 28 : 48
+    );
+    const moonMat = new THREE.MeshStandardMaterial({
+      map: albedo,
+      bumpMap: bump,
+      bumpScale: 0.075,
+      roughness: 0.88,
+      metalness: 0.05,
+    });
+    const moonMesh = new THREE.Mesh(moonGeo, moonMat);
+    moonMesh.rotation.z = THREE.MathUtils.degToRad(6.5);
+    heroStage.add(moonMesh);
+
+    // Subtle atmospheric fresnel halo rim around the Moon
+    const haloGeo = new THREE.SphereGeometry(1.56, 36, 24);
+    const haloMat = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.075,
+      side: THREE.BackSide,
+      depthWrite: false,
+    });
+    const moonHalo = new THREE.Mesh(haloGeo, haloMat);
+    heroStage.add(moonHalo);
+
+    
