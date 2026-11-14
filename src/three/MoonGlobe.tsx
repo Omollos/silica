@@ -124,3 +124,58 @@ function createEarthTexture(maxAnisotropy: number): THREE.CanvasTexture {
   grad.addColorStop(1, '#082f49');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, 512, 256);
+
+   ctx.fillStyle = '#22c55e';
+  ctx.globalAlpha = 0.72;
+  const blobs = [
+    [130, 105, 48, 32],
+    [170, 155, 28, 36],
+    [295, 92, 54, 30],
+    [325, 138, 36, 40],
+    [410, 118, 42, 28],
+  ];
+  blobs.forEach(([x, y, rx, ry]) => {
+    ctx.beginPath();
+    ctx.ellipse(x, y, rx, ry, 0.35, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  ctx.fillStyle = '#f8fafc';
+  ctx.globalAlpha = 0.34;
+  for (let i = 0; i < 14; i++) {
+    ctx.beginPath();
+    ctx.ellipse(
+      (i * 73) % 512,
+      36 + ((i * 41) % 180),
+      52,
+      8,
+      0.15,
+      0,
+      Math.PI * 2
+    );
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = maxAnisotropy;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function createGatewaySatellite(): {
+  group: THREE.Group;
+  dispose: () => void;
+} {
+  const group = new THREE.Group();
+
+  const hullGeo = new THREE.CylinderGeometry(0.052, 0.052, 0.19, 12);
+  const hullMat = new THREE.MeshStandardMaterial({
+    color: 0xe2e8f0,
+    metalness: 0.72,
+    roughness: 0.25,
+  });
+  const hull = new THREE.Mesh(hullGeo, hullMat);
+  hull.rotation.z = Math.PI / 2;
+  group.add(hull);
