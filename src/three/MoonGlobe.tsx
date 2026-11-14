@@ -327,4 +327,34 @@ export const MoonGlobe: React.FC = () => {
     const moonHalo = new THREE.Mesh(haloGeo, haloMat);
     heroStage.add(moonHalo);
 
-    
+    const beaconGeo = new THREE.SphereGeometry(0.058, 16, 16);
+    const beaconMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+    const beacon = new THREE.Mesh(beaconGeo, beaconMat);
+    beacon.position.set(0.16, -1.46, 0.22);
+    moonMesh.add(beacon);
+
+    const beamGeo = new THREE.CylinderGeometry(0.012, 0.048, 0.42, 12, 1, true);
+    const beamMat = new THREE.MeshBasicMaterial({
+      color: 0x7dd3fc,
+      transparent: true,
+      opacity: 0.42,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+    const beaconBeam = new THREE.Mesh(beamGeo, beamMat);
+    beaconBeam.position.set(0.18, -1.66, 0.24);
+    beaconBeam.rotation.z = -0.11;
+    beaconBeam.rotation.x = 0.14;
+    moonMesh.add(beaconBeam);
+
+    const ringGeo = new THREE.RingGeometry(0.095, 0.135, 32);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0x7dd3fc,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.88,
+    });
+    const landingRing = new THREE.Mesh(ringGeo, ringMat);
+    landingRing.position.set(0.16, -1.48, 0.22);
+    landingRing.lookAt(0.32, -2.96, 0.44);
+    moonMesh.add(landingRing);
