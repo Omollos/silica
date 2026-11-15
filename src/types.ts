@@ -222,6 +222,10 @@ export interface ScienceFact {
   nasaSourceName: string;
   nasaSourceUrl: string;
   relatedTerms: string[];
+  /** ISO date (YYYY-MM-DD) on which the link was last checked by a human/script. */
+  verifiedOn?: string;
+  /** "dataset" when the link is the primary data source, "article" for a NASA/CSA page. */
+  sourceKind?: 'dataset' | 'article';
 }
 
 export interface ScenarioData {
@@ -254,8 +258,10 @@ export interface ScenarioData {
 
 export type OsdrTopic = 'bone' | 'radiation' | 'immune' | 'food';
 
+export type NasaDataSource = 'live' | 'recorded' | 'fallback';
+
 export interface NasaSpaceWeather {
-  source: 'live' | 'fallback';
+  source: NasaDataSource;
   windowStart: string;
   windowEnd: string;
   fetchedAt: string;
@@ -280,6 +286,10 @@ export interface NasaSpaceWeather {
     link: string;
   } | null;
   kidBrief: string;
+  /** ISO date of the real recording when source is "recorded". */
+  recordedOn?: string;
+  /** Short, calm explanation when the payload is recorded or neutral. */
+  note?: string;
 }
 
 export interface RadLabSample {
@@ -290,7 +300,7 @@ export interface RadLabSample {
 }
 
 export interface RadLabSummary {
-  source: 'live' | 'fallback';
+  source: NasaDataSource;
   spacecraft: string;
   instruments: string[];
   sampleCount: number;
@@ -300,6 +310,11 @@ export interface RadLabSummary {
   samples: RadLabSample[];
   kidTakeaway: string;
   portalUrl: string;
+  /** The real recording window this reading came from. It is never live. */
+  observedWindow: { start: string; end: string };
+  fetchedAt: string;
+  recordedOn?: string;
+  note?: string;
 }
 
 export interface OsdrStudy {
@@ -312,8 +327,62 @@ export interface OsdrStudy {
 }
 
 export interface OsdrResponse {
-  source: 'live' | 'fallback';
+  source: NasaDataSource;
   topic: OsdrTopic;
   totalHits: number;
   studies: OsdrStudy[];
+  fetchedAt: string;
+  recordedOn?: string;
+  note?: string;
+}
+
+/** A real DONKI solar flare record (FLR). Presentation only: it never changes damage. */
+export interface NasaFlare {
+  id: string;
+  beginTime: string;
+  peakTime: string | null;
+  classType: string;
+  classLabel: string;
+  tier: 'mild' | 'medium' | 'strong';
+  sourceLocation: string | null;
+  link: string;
+  kid: TextPair;
+}
+
+export interface NasaFlareWindow {
+  source: NasaDataSource;
+  windowStart: string;
+  windowEnd: string;
+  fetchedAt: string;
+  featured: NasaFlare | null;
+  counts: { c: number; m: number; x: number };
+  flares: NasaFlare[];
+  recordedOn?: string;
+  note?: string;
+}
+
+export interface NasaProvenance {
+  dataset: string;
+  url: string;
+  window: string;
+  fetchedAt: string;
+}
+
+/**
+ * One whole UTC day of NASA mission data. Everyone who plays on the same UTC
+ * day receives this exact object, so a classroom shares one scenario and a
+ * same-day retry can never change difficulty.
+ */
+export interface NasaSnapshot {
+  snapshotId: string;
+  generatedAt: string;
+  source: NasaDataSource | 'unavailable';
+  bonus: 0 | 5 | 10;
+  spaceWeather: NasaSpaceWeather | null;
+  flare: NasaFlare | null;
+  radiation: RadLabSummary | null;
+  provenance: NasaProvenance[];
+  /** ISO date of the real recording when source is "recorded". */
+  recordedOn?: string;
+  note?: string;
 }
