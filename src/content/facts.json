@@ -1,0 +1,32 @@
+[
+  {
+    "id": "1",
+    "topic": "radiation",
+    "title": "Solar Radiation",
+    "kidSummary": "The Sun sends out energy that can be harmful in space.",
+    "scienceDetail": "Solar flares release bursts of radiation that can damage electronics and harm astronauts without proper shielding.",
+    "nasaSourceName": "NASA Space Weather",
+    "nasaSourceUrl": "https://www.nasa.gov/spaceweather",
+    "relatedTerms": ["solar flare", "radiation", "magnetosphere"]
+  },
+  {
+    "id": "2",
+    "topic": "lunar-night",
+    "title": "Lunar Night",
+    "kidSummary": "The Moon has very long days and nights.",
+    "scienceDetail": "A lunar day lasts about 14 Earth days, followed by 14 days of night. Temperatures drop dramatically during the lunar night.",
+    "nasaSourceName": "NASA Moon Facts",
+    "nasaSourceUrl": "https://www.nasa.gov/moon",
+    "relatedTerms": ["lunar day", "temperature", "crater"]
+  },
+  {
+    "id": "3",
+    "topic": "life-support",
+    "title": "Life Support Systems",
+    "kidSummary": "Astronauts need special systems to breathe and stay healthy in space.",
+    "scienceDetail": "The International Space Station uses advanced life support systems to recycle air and water, and remove carbon dioxide.",
+    "nasaSourceName": "NASA Life Support",
+    "nasaSourceUrl": "https://www.nasa.gov/lifesupport",
+    "relatedTerms": ["oxygen", "carbon dioxide", "recycling"]
+  }
+]
