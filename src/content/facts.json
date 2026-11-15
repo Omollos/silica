@@ -4,89 +4,107 @@
     "topic": "Moon Dirt (Regolith)",
     "title": "Baking Moon Dirt Into Breathable Air",
     "kidSummary": "Moon dirt isn't like garden soil—it is crushed gray rock full of trapped oxygen! With enough heat and electricity, astronauts can bake oxygen straight out of lunar dirt.",
-    "scienceDetail": "NASA's ISRU (In-Situ Resource Utilization) experiments show lunar regolith is ~40–45% oxygen by mass, bound in silicate and oxide minerals like ilmenite. Extracting it locally cuts rocket launch weight.",
-    "nasaSourceName": "NASA Lunar Regolith & Oxygen Extraction (ISRU)",
-    "nasaSourceUrl": "https://www.nasa.gov/mission/artemis/",
-    "relatedTerms": ["Regolith", "ISRU", "Oxygen"]
+    "scienceDetail": "NASA's lunar surface technology work develops oxygen extraction from regolith, including molten regolith electrolysis and carbothermal reduction. Regolith is roughly 40–45% oxygen by mass, bound in silicate and oxide minerals like ilmenite.",
+    "nasaSourceName": "NASA Lunar Surface Technology (ISRU)",
+    "nasaSourceUrl": "https://www.nasa.gov/lunar-surface-technology",
+    "relatedTerms": ["Regolith", "ISRU", "Oxygen"],
+    "verifiedOn": "2026-11-15",
+    "sourceKind": "article"
   },
   {
     "id": "fact-radiation",
     "topic": "Solar Flares & Shielding",
     "title": "Why Astronauts Stack Moon Dirt on Their Roof",
     "kidSummary": "Earth has a giant invisible magnetic bubble and thick air that block Sun storms. The Moon has neither! Stacking thick walls of moon dirt acts like armor against space radiation.",
-    "scienceDetail": "NASA DONKI tracks Coronal Mass Ejections and Solar Proton Events (>10 MeV). Without a magnetosphere, lunar surface crews need thick regolith shielding or storm shelters to keep doses safe.",
-    "nasaSourceName": "NASA Space Weather Database (DONKI) & Radiation Physics",
-    "nasaSourceUrl": "https://kauai.ccmc.gsfc.nasa.gov/DONKI/",
-    "relatedTerms": ["Solar Flare", "Radiation", "DONKI"]
+    "scienceDetail": "NASA DONKI tracks coronal mass ejections and solar particle events (protons above 10 MeV). On the Moon there is no magnetosphere or thick atmosphere, which is why Silica Station crews stack moon dirt and shelter during a flare.",
+    "nasaSourceName": "NASA Space Weather Database (DONKI)",
+    "nasaSourceUrl": "https://ccmc.gsfc.nasa.gov/tools/DONKI/",
+    "relatedTerms": ["Solar Flare", "Radiation", "DONKI"],
+    "verifiedOn": "2026-11-15",
+    "sourceKind": "dataset"
   },
   {
     "id": "fact-lunar-night",
     "topic": "Lunar Day & Night",
     "title": "Why Batteries Matter When the Sun Sets",
     "kidSummary": "A single night on the Moon lasts about two whole Earth weeks, and temperatures drop colder than any freezer! Solar panels make zero power in the dark, so crews must charge batteries early.",
-    "scienceDetail": "One lunar synodic day lasts ~29.5 Earth days (~14.7 days of sunlight and ~14.7 days of darkness), with shadowed temperatures plunging below -130°C to -246°C at Shackleton Crater. In Silica Station, the dark period is simplified to 5 rounds (Rounds 5–9) for classroom play.",
-    "nasaSourceName": "NASA Artemis Lunar South Pole Environment",
+    "scienceDetail": "One lunar synodic day lasts about 29.5 Earth days, with roughly 14.7 days of sunlight and 14.7 days of darkness. In Silica Station, the dark period is simplified to 5 rounds (Rounds 5–9) for classroom play.",
+    "nasaSourceName": "NASA Moon Weather",
     "nasaSourceUrl": "https://science.nasa.gov/moon/weather-on-the-moon/",
-    "relatedTerms": ["Lunar Night", "Solar Power", "Batteries"]
+    "relatedTerms": ["Lunar Night", "Solar Power", "Batteries"],
+    "verifiedOn": "2026-11-15",
+    "sourceKind": "article"
   },
   {
     "id": "fact-dust",
     "topic": "Lunar Dust",
     "title": "Moon Dust Sticks Like Static Cling",
     "kidSummary": "Lunar dust is sharp like tiny glass shards and carries static electricity, so it sticks to spacesuits and solar panels—blocking sunlight until astronauts clean them.",
-    "scienceDetail": "Apollo missions found that electrostatically charged lunar dust abrades seals, coats radiator surfaces, and reduces photovoltaic array efficiency unless actively mitigated.",
-    "nasaSourceName": "NASA Lunar Dust Mitigation & Apollo Lessons",
-    "nasaSourceUrl": "https://www.nasa.gov/humans-in-space/dust-mitigation/",
-    "relatedTerms": ["Lunar Dust", "Solar Panels", "Maintenance"]
+    "scienceDetail": "Apollo crews found that lunar dust clogged mechanisms, interfered with instruments, coated radiators and abraded spacesuits. NASA studies dust mitigation because the dust is fine, abrasive and electrostatically charged.",
+    "nasaSourceName": "NASA Dust: An Out-of-This World Problem",
+    "nasaSourceUrl": "https://www.nasa.gov/humans-in-space/dust-an-out-of-this-world-problem",
+    "relatedTerms": ["Lunar Dust", "Solar Panels", "Maintenance"],
+    "verifiedOn": "2026-11-15",
+    "sourceKind": "article"
   },
   {
     "id": "fact-ice",
     "topic": "South Pole Ice",
     "title": "Frozen Water Hiding in Dark Craters",
     "kidSummary": "Deep craters near the Moon's South Pole never see sunlight. They hold ancient frozen ice that rovers can mine and split into drinking water and air!",
-    "scienceDetail": "NASA's LCROSS and LRO missions confirmed water ice deposits inside Permanently Shadowed Regions (PSRs) near Shackleton Crater—the prime target for Artemis base camps.",
-    "nasaSourceName": "NASA LRO & LCROSS Water Ice Discovery",
+    "scienceDetail": "NASA's LCROSS and LRO missions confirmed water ice deposits inside permanently shadowed regions near the lunar poles, which is why Artemis targets the south polar region for a base camp.",
+    "nasaSourceName": "NASA Water Ice on the Moon",
     "nasaSourceUrl": "https://moon.nasa.gov/resources/341/water-ice-on-the-moon/",
-    "relatedTerms": ["Shackleton Crater", "Water Ice", "Rover"]
+    "relatedTerms": ["Shackleton Crater", "Water Ice", "Rover"],
+    "verifiedOn": "2026-11-15",
+    "sourceKind": "article"
   },
   {
     "id": "fact-exercise",
     "topic": "Low Gravity & Health",
     "title": "Why Moon Astronauts Never Skip Exercise",
     "kidSummary": "On the Moon you weigh six times less than on Earth! That sounds fun, but without daily workouts, astronauts' bones and muscles shrink fast.",
-    "scienceDetail": "NASA's Open Science Data Repository (OSDR) and ISS crew studies show microgravity and partial gravity cause bone mineral loss and muscle atrophy unless countered by daily resistive exercise.",
+    "scienceDetail": "NASA's Open Science Data Repository (OSDR) collects spaceflight studies showing that microgravity causes bone mineral loss and muscle atrophy unless crews exercise and eat well.",
     "nasaSourceName": "NASA Open Science Data Repository (OSDR)",
     "nasaSourceUrl": "https://osdr.nasa.gov/bio/",
-    "relatedTerms": ["OSDR", "Low Gravity", "Crew Health"]
+    "relatedTerms": ["OSDR", "Low Gravity", "Crew Health"],
+    "verifiedOn": "2026-11-15",
+    "sourceKind": "dataset"
   },
   {
     "id": "fact-radlab",
     "topic": "Radiation Dosimetry (RadLab)",
     "title": "Measuring Real Astronaut Radiation in Space",
     "kidSummary": "Invisible cosmic rays hit astronauts faster than on Earth! Radiation sensors aboard the Space Station measure exact dose rates every minute so engineers know how much armor crews need.",
-    "scienceDetail": "NASA OSDR's RadLab database combines real absorbed dose rate (µGy/hour) readings from ISS instruments like DosTel1 and DosTel2. Dose rates spike sharply when passing high-radiation zones, proving why thick lunar regolith shielding is critical.",
-    "nasaSourceName": "NASA OSDR RadLab Radiation Dosimetry Portal",
-    "nasaSourceUrl": "https://visualization.osdr.nasa.gov/radlab/gui/data-overview/",
-    "relatedTerms": ["RadLab", "DosTel", "Dose Rate"]
+    "scienceDetail": "NASA OSDR's RadLab portal publishes real absorbed dose rate readings (microgray per hour) from ISS instruments such as DosTel detectors. The dose changes as the station passes through different radiation zones, which is why thick shielding matters.",
+    "nasaSourceName": "NASA OSDR RadLab Radiation Dosimetry",
+    "nasaSourceUrl": "https://visualization.osdr.nasa.gov/",
+    "relatedTerms": ["RadLab", "DosTel", "Dose Rate"],
+    "verifiedOn": "2026-11-15",
+    "sourceKind": "dataset"
   },
   {
     "id": "fact-csa-food",
     "topic": "CSA Lunar Food Production",
     "title": "Growing Fresh Food on the Moon & in Remote Communities",
     "kidSummary": "Rockets can't bring fresh salad every week! Astronauts grow leafy greens, berries, and veggies inside energy-saving Moon greenhouses—and the same tech helps Northern towns on Earth grow food all winter.",
-    "scienceDetail": "The Canadian Space Agency (CSA) & Deep Space Food Challenge pioneer Controlled Environment Agriculture (CEA): closed-loop hydroponic systems that reuse water, conserve electricity, boost astronaut nutrition, and serve remote Northern communities.",
-    "nasaSourceName": "CSA · Food Production on the Moon & in Remote Areas",
-    "nasaSourceUrl": "https://www.asc-csa.gc.ca/eng/astronauts/living-in-space/eating-in-space/food-production-in-space.asp",
-    "relatedTerms": ["CSA", "Lunar Greenhouse", "Remote Food"]
+    "scienceDetail": "The Canadian Space Agency (CSA) studies how crews eat and grow food in space, including closed-loop greenhouse ideas that recycle water, save electricity and could serve remote Northern communities on Earth.",
+    "nasaSourceName": "CSA · Eating in space",
+    "nasaSourceUrl": "https://www.asc-csa.gc.ca/eng/astronauts/living-in-space/eating-in-space.asp",
+    "relatedTerms": ["CSA", "Lunar Greenhouse", "Remote Food"],
+    "verifiedOn": "2026-11-15",
+    "sourceKind": "article"
   },
   {
     "id": "fact-csa-stem",
     "topic": "CSA Youth & Educator Toolkit",
     "title": "Space STEM Activities for Kids Ages 7–12",
     "kidSummary": "Want to try real space experiments at school or home? The Canadian Space Agency shares free hands-on games, coding challenges, and moon-farming activities for young explorers.",
-    "scienceDetail": "CSA's Space Resources for STEM and Youth Organizations provides bilingual activities designed for classrooms, libraries, camps, and clubs to connect space exploration with nutrition, robotics, and sustainability on Earth.",
-    "nasaSourceName": "CSA · Space Resources for STEM & Youth",
-    "nasaSourceUrl": "https://www.asc-csa.gc.ca/eng/educators/resources-for-youth-organizations.asp",
-    "relatedTerms": ["CSA STEM", "Youth Activities", "Classroom"]
+    "scienceDetail": "The CSA's youth and educator resources provide bilingual activities for classrooms, libraries, camps and clubs, connecting space exploration with nutrition, robotics and sustainability on Earth.",
+    "nasaSourceName": "CSA · Resources for youth and educators",
+    "nasaSourceUrl": "https://www.asc-csa.gc.ca/eng/youth-educators/",
+    "relatedTerms": ["CSA STEM", "Youth Activities", "Classroom"],
+    "verifiedOn": "2026-11-15",
+    "sourceKind": "article"
   }
 ]

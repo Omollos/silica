@@ -1,0 +1,48 @@
+{
+  "flare": {
+    "label": "Real NASA flare",
+    "badge": "Class {classLabel}",
+    "short": "On {date}, NASA saw a {tierWord} flare on the Sun.",
+    "detail": "A flare class {classLabel} is {tierWord} strong. Your dirt wall helps against flares like this.",
+    "noClass": "NASA watched the Sun that day and saw a flare."
+  },
+  "weather": {
+    "live": "NASA saw {cmeCount} solar eruptions in 28 days. Space weather today is {activityWord}.",
+    "quiet": "The Sun looks quiet. No big solar storms were seen.",
+    "kp": "A Kp index of {kpIndex} means the space storm is {kpWord}.",
+    "fetched": "Checked on {date}."
+  },
+  "radiation": {
+    "recorded": "Space Station sensors measured radiation for two hours. The peak was {peak} microgray per hour.",
+    "meaning": "Radiation is invisible energy from space. Thick moon dirt blocks some of it.",
+    "window": "Recorded on the ISS, {date}.",
+    "offline": "The ISS dose chart is resting right now."
+  },
+  "studies": {
+    "bone": "Astronauts lose bone and muscle in space. Daily exercise keeps both strong.",
+    "radiation": "Space radiation can harm cells. NASA measures doses to design thick shields.",
+    "immune": "Space travel can stress the immune system. Rest, food and clean air help crews stay healthy.",
+    "food": "Plants can grow in space. They give crews fresh food and oxygen.",
+    "offline": "The NASA study shelf is resting right now."
+  },
+  "badges": {
+    "live": "Live today",
+    "recorded": "Recorded {date}",
+    "offline": "Offline note",
+    "realNasa": "Real data from NASA",
+    "recordedNasa": "Recorded NASA data from {date}",
+    "forGrownUps": "For grown-ups"
+  },
+  "grownUps": {
+    "prompt": "Ask a grown-up: what is 7 + 8?",
+    "check": "Check",
+    "cancel": "Close",
+    "wrong": "Not yet. Ask a grown-up to help you.",
+    "open": "Open link"
+  },
+  "calm": {
+    "weather": "NASA's news feed is resting right now.",
+    "unavailable": "No NASA data for this day. The mission still works."
+  },
+  "attribution": "Data from NASA's Open APIs, DONKI and the Open Science Data Repository. This game is not endorsed by NASA."
+}

@@ -2,6 +2,7 @@ import React from 'react';
 import { IconName, SkyState, TextPair } from '../../types';
 import { StationIcon } from '../../ui/icons';
 import { DetailTap } from '../../ui/DetailTap';
+import { FlareBriefing } from '../../ui/FlareBriefing';
 
 interface EventBannerProps {
   round: number;
@@ -106,6 +107,9 @@ export const EventBanner: React.FC<EventBannerProps> = ({
           <DetailTap promptLabel="Why?" detailText={warning.detail} />
         </div>
       )}
+
+      {/* Round 6 warning / round 8 flare screen: a real, dated NASA flare. */}
+      <FlareBriefing round={round} />
     </div>
   );
 };

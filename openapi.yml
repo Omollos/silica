@@ -1,0 +1,497 @@
+openapi: 3.1.0
+info:
+  title: Silica Station backend
+  version: 1.0.0
+  description: |
+    Anonymous run saving, classroom statistics and hardened NASA proxies for the
+    Silica Station lunar survival game. Same-origin by default; no authentication
+    for game routes. All timestamps are ISO 8601 UTC.
+servers:
+  - url: http://localhost:3000
+paths:
+  /api/health:
+    get:
+      summary: Liveness and store health
+      responses:
+        '200':
+          description: Service and store are healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        '503':
+          description: Store check failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+  /api/runs/{runId}:
+    parameters:
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: '^[A-Za-z0-9_-]{6,64}$'
+    put:
+      summary: Save or extend an anonymous run (idempotent)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunInput'
+      responses:
+        '201':
+          description: First write
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunSaveResponse'
+        '200':
+          description: Identical resend or progressive extension
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunSaveResponse'
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+    get:
+      summary: Read one stored run
+      responses:
+        '200':
+          description: Stored summary and report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoredRun'
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/stats:
+    get:
+      summary: Anonymous aggregate classroom statistics
+      description: Verified runs only; suppressed when fewer than five are complete.
+      responses:
+        '200':
+          description: Aggregates (cached 60 seconds)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stats'
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/nasa/space-weather:
+    get:
+      summary: DONKI CME/GST/SEP summary over 28 days
+      responses:
+        '200':
+          description: Live, stale or fallback payload
+          headers:
+            X-Cache: { $ref: '#/components/headers/XCache' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceWeather'
+  /api/nasa/radlab:
+    get:
+      summary: ISS RadLab dosimetry summary
+      responses:
+        '200':
+          description: Live, stale or fallback payload
+          headers:
+            X-Cache: { $ref: '#/components/headers/XCache' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RadLab'
+  /api/nasa/osdr:
+    get:
+      summary: OSDR study search
+      parameters:
+        - name: topic
+          in: query
+          schema:
+            type: string
+            enum: [bone, radiation, immune, food]
+            default: bone
+      responses:
+        '200':
+          description: Live, stale or fallback payload
+          headers:
+            X-Cache: { $ref: '#/components/headers/XCache' }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Osdr'
+  /api/admin/export.csv:
+    get:
+      summary: Export finished runs as CSV (P2)
+      description: 404 unless ADMIN_TOKEN is configured.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: CSV attachment
+          content:
+            text/csv:
+              schema:
+                type: string
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  headers:
+    XCache:
+      description: Cache outcome
+      schema:
+        type: string
+        enum: [hit, miss, stale, fallback]
+  responses:
+    BadRequest:
+      description: Invalid body or run id
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unauthorized:
+      description: Invalid admin token
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Conflict:
+      description: run_conflict or run_finished
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unprocessable:
+      description: unknown_choice, illegal_choice, round_mismatch or choices_after_end
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    RateLimited:
+      description: Too many requests
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum:
+                - invalid_body
+                - unknown_choice
+                - illegal_choice
+                - round_mismatch
+                - choices_after_end
+                - run_conflict
+                - run_finished
+                - not_found
+                - rate_limited
+                - unauthorized
+                - server_error
+            message: { type: string }
+      additionalProperties: false
+    Health:
+      type: object
+      required: [status, version, db, uptimeSeconds]
+      properties:
+        status: { type: string, enum: [ok, error] }
+        version: { type: string }
+        db: { type: string, enum: [ok, error] }
+        uptimeSeconds: { type: integer, minimum: 0 }
+      additionalProperties: false
+    Choice:
+      type: object
+      required: [round, choiceId]
+      properties:
+        round: { type: integer, minimum: 1, maximum: 12 }
+        choiceId:
+          type: string
+          pattern: '^[a-z0-9_]+$'
+          maxLength: 64
+      additionalProperties: false
+    ClientSummary:
+      type: object
+      properties:
+        status: { type: string, enum: [playing, won, partial, lost] }
+        round: { type: integer, minimum: 1, maximum: 12 }
+        power: { type: number }
+        oxygen: { type: number }
+        health: { type: number }
+      additionalProperties: false
+    RunInput:
+      type: object
+      required: [seed, difficulty, liveFlareBonus, choices]
+      properties:
+        seed: { type: integer, minimum: 0, maximum: 2147483647 }
+        difficulty: { type: string, enum: [cadet, standard, commander] }
+        liveFlareBonus: { type: integer, enum: [0, 5, 10] }
+        choices:
+          type: array
+          maxItems: 12
+          items: { $ref: '#/components/schemas/Choice' }
+        clientSummary: { $ref: '#/components/schemas/ClientSummary' }
+      additionalProperties: false
+    Report:
+      type: object
+      description: MissionReport from src/types.ts
+      additionalProperties: true
+    RunSaveResponse:
+      type: object
+      required: [runId, verified, status, round, report, mismatch]
+      properties:
+        runId: { type: string }
+        verified: { type: boolean }
+        status: { type: string, enum: [playing, won, partial, lost] }
+        round: { type: integer, minimum: 1, maximum: 12 }
+        report:
+          oneOf:
+            - { $ref: '#/components/schemas/Report' }
+            - { type: 'null' }
+        mismatch:
+          type: array
+          items: { type: string, enum: [status, round, power, oxygen, health] }
+      additionalProperties: false
+    StoredRun:
+      type: object
+      required:
+        - runId
+        - seed
+        - difficulty
+        - liveFlareBonus
+        - status
+        - failureReason
+        - roundsSurvived
+        - verified
+        - mismatch
+        - startedAt
+        - updatedAt
+        - choices
+        - report
+      properties:
+        runId: { type: string }
+        seed: { type: integer }
+        difficulty: { type: string, enum: [cadet, standard, commander] }
+        liveFlareBonus: { type: integer, enum: [0, 5, 10] }
+        status: { type: string, enum: [playing, won, partial, lost] }
+        failureReason:
+          oneOf:
+            - { type: string, enum: [oxygen, health] }
+            - { type: 'null' }
+        roundsSurvived: { type: integer }
+        score:
+          oneOf: [{ type: integer }, { type: 'null' }]
+        finalPower:
+          oneOf: [{ type: integer }, { type: 'null' }]
+        finalOxygen:
+          oneOf: [{ type: integer }, { type: 'null' }]
+        finalHealth:
+          oneOf: [{ type: integer }, { type: 'null' }]
+        finalMoonDirt:
+          oneOf: [{ type: integer }, { type: 'null' }]
+        finalShield:
+          oneOf: [{ type: integer }, { type: 'null' }]
+        verified: { type: boolean }
+        mismatch:
+          type: array
+          items: { type: string }
+        startedAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        completedAt:
+          oneOf: [{ type: string, format: date-time }, { type: 'null' }]
+        choices:
+          type: array
+          items: { $ref: '#/components/schemas/Choice' }
+        report:
+          oneOf:
+            - { $ref: '#/components/schemas/Report' }
+            - { type: 'null' }
+      additionalProperties: false
+    Stats:
+      type: object
+      required:
+        - generatedAt
+        - minSample
+        - suppressed
+        - totals
+        - outcomes
+        - failureReasons
+        - averageScore
+        - byDifficulty
+        - endRound
+        - choicePopularity
+      properties:
+        generatedAt: { type: string, format: date-time }
+        minSample: { type: integer, minimum: 1 }
+        suppressed: { type: boolean }
+        totals:
+          type: object
+          required: [runs, completed]
+          properties:
+            runs: { type: integer }
+            completed: { type: integer }
+        outcomes:
+          type: object
+          required: [won, partial, lost]
+          properties:
+            won: { type: integer }
+            partial: { type: integer }
+            lost: { type: integer }
+        failureReasons:
+          type: object
+          required: [oxygen, health]
+          properties:
+            oxygen: { type: integer }
+            health: { type: integer }
+        averageScore: { type: number }
+        byDifficulty:
+          type: object
+          required: [cadet, standard, commander]
+          additionalProperties:
+            type: object
+            required: [runs, won, partial, lost]
+            properties:
+              runs: { type: integer }
+              won: { type: integer }
+              partial: { type: integer }
+              lost: { type: integer }
+        endRound:
+          type: array
+          items:
+            type: object
+            required: [round, count]
+            properties:
+              round: { type: integer }
+              count: { type: integer }
+        choicePopularity:
+          type: array
+          items:
+            type: object
+            required: [round, choiceId, count, share]
+            properties:
+              round: { type: integer }
+              choiceId: { type: string }
+              count: { type: integer }
+              share: { type: number }
+    SpaceWeather:
+      type: object
+      required:
+        - source
+        - windowStart
+        - windowEnd
+        - fetchedAt
+        - activityLevel
+        - recommendedFlareBonus
+        - cmeCount
+        - maxCmeSpeedKmS
+        - gstCount
+        - maxKpIndex
+        - sepCount
+        - latestCme
+        - latestGst
+        - kidBrief
+      properties:
+        source: { type: string, enum: [live, fallback] }
+        windowStart: { type: string }
+        windowEnd: { type: string }
+        fetchedAt: { type: string }
+        activityLevel: { type: string, enum: [Quiet, Elevated, 'Storm Watch'] }
+        recommendedFlareBonus: { type: integer }
+        cmeCount: { type: integer }
+        maxCmeSpeedKmS: { type: integer }
+        gstCount: { type: integer }
+        maxKpIndex: { type: number }
+        sepCount: { type: integer }
+        latestCme:
+          oneOf:
+            - type: object
+              properties:
+                id: { type: string }
+                startTime: { type: string }
+                speedKmS: { oneOf: [{ type: integer }, { type: 'null' }] }
+                note: { type: string }
+                link: { type: string }
+            - type: 'null'
+        latestGst:
+          oneOf:
+            - type: object
+              properties:
+                id: { type: string }
+                startTime: { type: string }
+                kpIndex: { type: number }
+                link: { type: string }
+            - type: 'null'
+        kidBrief: { type: string }
+    RadLab:
+      type: object
+      required:
+        - source
+        - spacecraft
+        - instruments
+        - sampleCount
+        - avgDoseMicroGyHr
+        - minDoseMicroGyHr
+        - peakDoseMicroGyHr
+        - samples
+        - kidTakeaway
+        - portalUrl
+      properties:
+        source: { type: string, enum: [live, fallback] }
+        spacecraft: { type: string }
+        instruments:
+          type: array
+          items: { type: string }
+        sampleCount: { type: integer }
+        avgDoseMicroGyHr: { type: number }
+        minDoseMicroGyHr: { type: number }
+        peakDoseMicroGyHr: { type: number }
+        samples:
+          type: array
+          items:
+            type: object
+            required: [timestamp, instrumentId, absorbedDoseRate, flux]
+            properties:
+              timestamp: { type: string }
+              instrumentId: { type: string }
+              absorbedDoseRate: { type: number }
+              flux: { oneOf: [{ type: number }, { type: 'null' }] }
+        kidTakeaway: { type: string }
+        portalUrl: { type: string }
+    Osdr:
+      type: object
+      required: [source, topic, totalHits, studies]
+      properties:
+        source: { type: string, enum: [live, fallback] }
+        topic: { type: string, enum: [bone, radiation, immune, food] }
+        totalHits: { type: integer }
+        studies:
+          type: array
+          items:
+            type: object
+            required: [accession, title, organism, flightProgram, summary, url]
+            properties:
+              accession: { type: string }
+              title: { type: string }
+              organism: { type: string }
+              flightProgram: { type: string }
+              summary: { type: string }
+              url: { type: string }

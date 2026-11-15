@@ -10,6 +10,16 @@ import {
 } from '../audio/sfx';
 import { useSettingsStore } from './settingsStore';
 import { useNasaDataStore } from './nasaDataStore';
+import {
+  NO_SNAPSHOT_ID,
+  pinForRetrySame,
+  pinForStart,
+  seedForNewScenario,
+  waitForSnapshot,
+  type FlareBonus,
+  type RunPin,
+} from './pinRunData';
+import { syncRun } from '../api/runsClient';
 
 export type ScreenMode = 'title' | 'playing' | 'end';
 
@@ -21,6 +31,13 @@ export interface StatDeltas {
   shield: number;
 }
 
+export interface BeginMissionOptions {
+  /** Set by "Same Scenario": replay the exact pin, no waiting, no refetch. */
+  pin?: RunPin;
+  /** Overridable only so tests do not wait two real seconds. */
+  waitMs?: number;
+}
+
 interface GameStoreState {
   screen: ScreenMode;
   gameState: GameState;
@@ -29,8 +46,16 @@ interface GameStoreState {
   lastChoiceId: string | null;
   lastDeltas: StatDeltas | null;
   outcomeModalOpen: boolean;
+  /** Store-level pin, never engine state: the NASA data this run started with. */
+  pinnedSnapshotId: string;
+  pinnedBonus: FlareBonus;
+  startingMission: boolean;
   setDifficulty: (difficulty: DifficultyMode) => void;
-  beginMission: (seed?: number, difficulty?: DifficultyMode) => void;
+  beginMission: (
+    seed?: number,
+    difficulty?: DifficultyMode,
+    options?: BeginMissionOptions
+  ) => Promise<void>;
   choose: (choiceId: string) => void;
   openMissionReport: () => void;
   setOutcomeModalOpen: (open: boolean) => void;
@@ -47,30 +72,48 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   lastChoiceId: null,
   lastDeltas: null,
   outcomeModalOpen: false,
+  pinnedSnapshotId: NO_SNAPSHOT_ID,
+  pinnedBonus: 0,
+  startingMission: false,
 
   setDifficulty: (difficulty: DifficultyMode) => set({ difficulty }),
 
-  beginMission: (seed = 1, difficulty) => {
-    stopSpeaking();
-    const activeDifficulty = difficulty ?? get().difficulty;
-    const { sfxEnabled } = useSettingsStore.getState();
-    const { useLiveWeather, spaceWeather } = useNasaDataStore.getState();
-    const liveFlareBonus = useLiveWeather
-      ? spaceWeather?.recommendedFlareBonus ?? 0
-      : 0;
+  beginMission: async (seed = 1, difficulty, options: BeginMissionOptions = {}) => {
+    if (get().startingMission) return;
+    set({ startingMission: true });
 
+    const activeDifficulty = difficulty ?? get().difficulty;
+
+    let pin: RunPin = options.pin ?? { snapshotId: NO_SNAPSHOT_ID, bonus: 0 };
+
+    if (!options.pin) {
+      const nasa = useNasaDataStore.getState();
+      if (nasa.useLiveWeather) {
+        const ready = nasa.snapshot ? Promise.resolve() : nasa.fetchSnapshot();
+        const arrived = await waitForSnapshot(ready, options.waitMs);
+        pin = pinForStart(useNasaDataStore.getState().snapshot, arrived);
+      }
+    }
+
+    stopSpeaking();
+    const { sfxEnabled } = useSettingsStore.getState();
     playAdvance(sfxEnabled);
     useSettingsStore.getState().setSpeakingNow(false);
 
+    const gameState = startGame(seed, activeDifficulty, pin.bonus);
     set({
       screen: 'playing',
       currentSeed: seed,
       difficulty: activeDifficulty,
-      gameState: startGame(seed, activeDifficulty, liveFlareBonus),
+      gameState,
+      pinnedSnapshotId: pin.snapshotId,
+      pinnedBonus: pin.bonus,
       lastChoiceId: null,
       lastDeltas: null,
       outcomeModalOpen: false,
+      startingMission: false,
     });
+    void syncRun(gameState, pin.snapshotId);
   },
 
   choose: (choiceId: string) => {
@@ -110,6 +153,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       screen: 'playing',
       outcomeModalOpen: next.status !== 'playing',
     });
+
+    if (next.status !== 'playing') void syncRun(next, get().pinnedSnapshotId);
   },
 
   openMissionReport: () => {
@@ -121,14 +166,15 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   setOutcomeModalOpen: (open: boolean) => set({ outcomeModalOpen: open }),
 
   retrySameScenario: () => {
-    const { currentSeed, difficulty } = get();
-    get().beginMission(currentSeed, difficulty);
+    const { currentSeed, difficulty, pinnedSnapshotId, pinnedBonus } = get();
+    void get().beginMission(currentSeed, difficulty, {
+      pin: pinForRetrySame({ snapshotId: pinnedSnapshotId, bonus: pinnedBonus }),
+    });
   },
 
   retryNewScenario: () => {
     const { currentSeed, difficulty } = get();
-    const nextSeed = currentSeed === 1 ? 42 : currentSeed + 17;
-    get().beginMission(nextSeed, difficulty);
+    void get().beginMission(seedForNewScenario(currentSeed), difficulty);
   },
 
   goToTitle: () => {
@@ -142,6 +188,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       lastChoiceId: null,
       lastDeltas: null,
       outcomeModalOpen: false,
+      pinnedSnapshotId: NO_SNAPSHOT_ID,
+      pinnedBonus: 0,
     });
   },
 }));
