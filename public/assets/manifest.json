@@ -1,0 +1,10 @@
+{
+  "images": {
+    "logo": "/assets/logo.png",
+    "background": "/assets/background.jpg"
+  },
+  "audio": {
+    "click": "/assets/audio/click.wav",
+    "success": "/assets/audio/success.wav"
+  }
+}
