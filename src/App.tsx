@@ -1,15 +1,27 @@
-import React from 'react';
+import { useState } from 'react';
+import { MissionReport } from './screens/end/MissionReport';
+import { RoundScreen } from './screens/round/RoundScreen';
+import { TitleScreen } from './screens/title/TitleScreen';
+import { useGameStore } from './store/gameStore';
+import { ScienceLibraryModal } from './ui/ScienceLibraryModal';
 
 export function App() {
+  const screen = useGameStore(state => state.screen);
+  const [scienceLibraryOpen, setScienceLibraryOpen] = useState(false);
+
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#050914] text-slate-100 p-6">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Project Scaffold Ready</h1>
-        <p className="text-sm text-slate-400">
-          React, Tailwind CSS v4, Three.js, Zustand, Express, and Vitest are installed.
-        </p>
-      </div>
-    </main>
+    <>
+      {screen === 'title' ? (
+        <TitleScreen onOpenLibrary={() => setScienceLibraryOpen(true)} />
+      ) : screen === 'playing' ? (
+        <RoundScreen onOpenLibrary={() => setScienceLibraryOpen(true)} />
+      ) : (
+        <MissionReport onOpenLibrary={() => setScienceLibraryOpen(true)} />
+      )}
+      {scienceLibraryOpen && (
+        <ScienceLibraryModal onClose={() => setScienceLibraryOpen(false)} />
+      )}
+    </>
   );
 }
 
