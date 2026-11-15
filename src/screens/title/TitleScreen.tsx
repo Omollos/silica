@@ -11,6 +11,7 @@ interface TitleScreenProps {
 
 export const TitleScreen: React.FC<TitleScreenProps> = ({ onOpenLibrary }) => {
   const beginMission = useGameStore(s => s.beginMission);
+  const startingMission = useGameStore(s => s.startingMission);
   const preloadAll = useNasaDataStore(s => s.preloadAll);
 
   useEffect(() => {
@@ -58,10 +59,12 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onOpenLibrary }) => {
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <button
               type="button"
-              onClick={() => beginMission(1, 'standard')}
-              className="min-h-[52px] px-7 py-3.5 rounded-2xl bg-gradient-to-r from-sky-400 to-cyan-300 hover:from-sky-300 hover:to-cyan-200 text-slate-950 font-display text-lg font-extrabold shadow-lg shadow-sky-500/30 transition-all hover:-translate-y-0.5 cursor-pointer whitespace-nowrap"
+              onClick={() => void beginMission(1, 'standard')}
+              disabled={startingMission}
+              aria-busy={startingMission}
+              className="min-h-[52px] px-7 py-3.5 rounded-2xl bg-gradient-to-r from-sky-400 to-cyan-300 hover:from-sky-300 hover:to-cyan-200 text-slate-950 font-display text-lg font-extrabold shadow-lg shadow-sky-500/30 transition-all hover:-translate-y-0.5 cursor-pointer whitespace-nowrap disabled:opacity-80 disabled:cursor-wait disabled:translate-y-0"
             >
-              Launch Mission →
+              {startingMission ? 'Checking NASA space weather…' : 'Launch Mission →'}
             </button>
 
             <button
