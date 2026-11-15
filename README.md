@@ -1,11 +1,45 @@
-<div align="center">
+# Silica Station
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+A lunar survival decision game where players command a Moon outpost and make critical decisions to keep their crew alive through 12 rounds of challenges.
 
-  <h1>Built with AI Studio</h2>
+## Features
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+- **Real-time Strategy**: Make decisions about power, oxygen, health, and resources
+- **Educational**: Learn about real NASA space missions and lunar science
+- **Accessibility**: Text-to-speech support for all content
+- **Multiple Difficulties**: Cadet, Standard, and Commander modes
+- **Rich Feedback**: Visual and audio feedback for all decisions
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Tech Stack
 
-</div>
+- **Frontend**: React 19, TypeScript, Tailwind CSS 4
+- **State Management**: Zustand
+- **Build Tool**: Vite 8
+- **Audio**: Web Audio API for procedural sound effects
+- **Speech**: Web Speech API for text-to-speech
+
+## Getting Started
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Start development server: `npm run dev`
+4. Build for production: `npm run build`
+
+## Project Structure
+
+```
+src/
+├── audio/          # Sound effects and speech synthesis
+├── engine/         # Game logic and rules
+├── screens/        # React screens
+│   ├── end/       # Mission report screens
+│   ├── round/     # Gameplay screens
+│   └── title/     # Title screen
+├── store/         # Zustand state stores
+├── types.ts       # TypeScript type definitions
+└── ui/            # Reusable UI components
+```
+
+## License
+
+MIT
