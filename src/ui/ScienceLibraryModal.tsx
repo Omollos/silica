@@ -161,7 +161,6 @@ export const ScienceLibraryModal: React.FC<ScienceLibraryModalProps> = ({
                           {fact.title}
                         </div>
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <ScienceBadge kind="offline" />
                           {fact.verifiedOn && (
                             <span className="text-[11px] text-slate-400">
                               Checked {formatKidDate(fact.verifiedOn)}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface DetailTapProps {
   promptLabel: string;
@@ -14,10 +14,38 @@ export const DetailTap: React.FC<DetailTapProps> = ({
   extraNote,
 }) => {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    if (!open) return;
+
+    const updatePosition = () => {
+      const rect = triggerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      const panelWidth = Math.min(288, window.innerWidth - 32);
+      const panelHeight = 180;
+      const x = Math.min(Math.max(rect.left + rect.width / 2 - panelWidth / 2, 16), window.innerWidth - panelWidth - 16);
+      const y = Math.min(rect.bottom + 12, window.innerHeight - panelHeight - 16);
+
+      setPanelPosition({ x, y });
+    };
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [open]);
 
   return (
     <div className="relative inline-block max-w-full">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen(value => !value)}
         aria-expanded={open}
@@ -28,7 +56,13 @@ export const DetailTap: React.FC<DetailTapProps> = ({
       {open && (
         <div
           role="note"
-          className="absolute z-30 left-0 top-full mt-2 w-72 max-w-[85vw] rounded-xl border border-slate-600 bg-[#070b14] p-3 text-xs text-slate-200 shadow-2xl space-y-2"
+          style={{
+            position: 'fixed',
+            left: `${panelPosition.x}px`,
+            top: `${panelPosition.y}px`,
+            width: 'min(18rem, calc(100vw - 2rem))',
+          }}
+          className="z-50 rounded-xl border border-slate-600 bg-[#070b14] p-3 text-xs text-slate-200 shadow-2xl space-y-2"
         >
           {shortText && <p className="font-semibold text-white">{shortText}</p>}
           <p className="leading-relaxed">{detailText}</p>

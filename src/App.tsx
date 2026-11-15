@@ -18,9 +18,10 @@ export function App() {
       ) : (
         <MissionReport onOpenLibrary={() => setScienceLibraryOpen(true)} />
       )}
-      {scienceLibraryOpen && (
-        <ScienceLibraryModal onClose={() => setScienceLibraryOpen(false)} />
-      )}
+      <ScienceLibraryModal
+        open={scienceLibraryOpen}
+        onClose={() => setScienceLibraryOpen(false)}
+      />
     </>
   );
 }
