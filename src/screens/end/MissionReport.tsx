@@ -6,6 +6,13 @@ import { AstronautFace } from '../../ui/AstronautFace';
 import { SpeakerButton } from '../../ui/SpeakerButton';
 import { DetailTap } from '../../ui/DetailTap';
 import { StationIcon } from '../../ui/icons';
+import { GrownUpLink } from '../../ui/GrownUpLink';
+import {
+  calmLine,
+  formatKidDate,
+  radiationWindowLabel,
+  truthLabel,
+} from '../../shared/nasa/kidText';
 import { StationScene } from '../round/StationScene';
 import { ReportChain } from './ReportChain';
 import { WinScreen } from './WinScreen';
@@ -23,9 +30,18 @@ export const MissionReport: React.FC<MissionReportProps> = ({
   const retrySameScenario = useGameStore(s => s.retrySameScenario);
   const retryNewScenario = useGameStore(s => s.retryNewScenario);
   const goToTitle = useGameStore(s => s.goToTitle);
-  const spaceWeather = useNasaDataStore(s => s.spaceWeather);
-  const radLab = useNasaDataStore(s => s.radLab);
+  const pinnedSnapshotId = useGameStore(s => s.pinnedSnapshotId);
+  const snapshot = useNasaDataStore(s => s.snapshot);
   const preloadAll = useNasaDataStore(s => s.preloadAll);
+
+  // Only the snapshot this run was pinned to may describe the run.
+  const pinned = snapshot && snapshot.snapshotId === pinnedSnapshotId ? snapshot : null;
+  const facedFlare = gameState.trace.some(entry => entry.round === 8);
+  // Label the data that is actually shown: with no space weather there is
+  // nothing to call "Real data from NASA".
+  const pinnedTruth = pinned?.spaceWeather
+    ? truthLabel(pinned.source, pinned.recordedOn)
+    : null;
 
   useEffect(() => {
     preloadAll();
@@ -190,25 +206,48 @@ export const MissionReport: React.FC<MissionReportProps> = ({
               onClick={onOpenLibrary}
               className="text-xs font-semibold text-sky-300 hover:text-sky-200 underline underline-offset-2 cursor-pointer whitespace-nowrap"
             >
-              Inspect Live Data in Library →
+              Open Science Library →
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-300 leading-relaxed">
             <div className="rounded-xl bg-slate-950/75 border border-slate-800 p-3 space-y-1">
-              <div className="font-bold text-amber-300">NASA DONKI Solar Watch</div>
+              <div className="font-bold text-amber-300">NASA Space Weather</div>
               <p>
-                {spaceWeather
-                  ? `Status: ${spaceWeather.activityLevel} · ${spaceWeather.cmeCount} CMEs tracked, peak Kp ${spaceWeather.maxKpIndex || 0}.`
-                  : 'Tracks real coronal mass ejections & solar storms driving flare risk.'}
+                {pinned?.spaceWeather
+                  ? `Space weather today: ${pinned.spaceWeather.activityLevel}.`
+                  : pinnedSnapshotId !== 'none'
+                    ? calmLine('weather')
+                    : calmLine('unavailable')}
+              </p>
+              {facedFlare && pinned?.flare && (
+                <p className="text-slate-100">
+                  {`The crew faced a real class ${pinned.flare.classLabel} flare`}
+                  {formatKidDate(pinned.flare.peakTime ?? pinned.flare.beginTime)
+                    ? ` on ${formatKidDate(pinned.flare.peakTime ?? pinned.flare.beginTime)}`
+                    : ''}
+                  .
+                </p>
+              )}
+              <p className="text-[11px] text-slate-400">
+                {pinnedSnapshotId !== 'none' ? `Snapshot ${pinnedSnapshotId}` : 'No snapshot'}
+                {pinnedTruth ? ` · ${pinnedTruth}` : ''}
               </p>
             </div>
             <div className="rounded-xl bg-slate-950/75 border border-slate-800 p-3 space-y-1">
               <div className="font-bold text-sky-300">NASA RadLab & OSDR</div>
               <p>
-                {radLab
-                  ? `ISS DosTel peaked at ${radLab.peakDoseMicroGyHr} µGy/hr; your station reached ${Math.min(30, report.finalShield)}/30 roof armor.`
-                  : 'Measures ISS absorbed dose rates and spaceflight bone/muscle research.'}
+                {pinned?.radiation && pinned.radiation.sampleCount > 0
+                  ? `${radiationWindowLabel(
+                      pinned.radiation.observedWindow.start
+                    )} Peak ${pinned.radiation.peakDoseMicroGyHr} microgray per hour. Your roof armor reached ${Math.min(30, report.finalShield)}/30.`
+                  : calmLine('radiation')}
               </p>
+              <GrownUpLink
+                href="https://visualization.osdr.nasa.gov/"
+                className="inline-block text-[11px] font-semibold text-sky-300 hover:text-sky-200 underline underline-offset-2 cursor-pointer"
+              >
+                NASA ISS dose data →
+              </GrownUpLink>
             </div>
             <div className="rounded-xl bg-slate-950/75 border border-slate-800 p-3 space-y-1">
               <div className="font-bold text-emerald-300">CSA Lunar Food & STEM</div>

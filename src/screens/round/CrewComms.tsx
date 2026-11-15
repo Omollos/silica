@@ -3,6 +3,8 @@ import { GameState, SkyState } from '../../types';
 import { playClick } from '../../audio/sfx';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useNasaDataStore } from '../../store/nasaDataStore';
+import { FlareBriefing } from '../../ui/FlareBriefing';
+import { studyKidSummary } from '../../shared/nasa/kidText';
 
 interface CrewCommsProps {
   gameState: GameState;
@@ -37,10 +39,9 @@ function getCrewTip(
       color: 'text-amber-300',
       line: `Solar storm right overhead! Our Roof Shield (${Math.min(30, gameState.shield)}/30) blocks first, and Shelter cuts the rest in half.`,
       scienceNote:
-        donkiText ??
-        (radLabPeak
-          ? `NASA RadLab ISS sensors recorded spikes up to ${radLabPeak} µGy/hr in high-radiation zones.`
-          : undefined),
+        radLabPeak
+          ? `Recorded on the ISS: sensors measured up to ${radLabPeak} microgray per hour.`
+          : donkiText,
     };
   }
   if (gameState.power <= 20) {
@@ -91,10 +92,7 @@ function getCrewTip(
       role: 'Life Support',
       color: 'text-emerald-300',
       line: 'Almost at Round 12! Remember: choices in Rounds 10–12 still count during the final Resupply Check-Up.',
-      scienceNote:
-        gameState.round === 11
-          ? 'NASA OSDR study OSD-342 shows daily exercise protects astronaut bones and muscles in low gravity!'
-          : undefined,
+      scienceNote: gameState.round === 11 ? studyKidSummary('bone') : undefined,
     };
   }
   return {
@@ -108,28 +106,34 @@ function getCrewTip(
 export const CrewComms: React.FC<CrewCommsProps> = ({ gameState, sky }) => {
   const [open, setOpen] = useState(false);
   const sfxEnabled = useSettingsStore(s => s.sfxEnabled);
-  const spaceWeather = useNasaDataStore(s => s.spaceWeather);
+  const snapshot = useNasaDataStore(s => s.snapshot);
   const radLab = useNasaDataStore(s => s.radLab);
 
-  const donkiSummary = spaceWeather
-    ? `Live NASA DONKI: ${spaceWeather.activityLevel} (${spaceWeather.cmeCount} recent CMEs, max Kp ${spaceWeather.maxKpIndex || 0}).`
-    : undefined;
+  // Server-templated kid text: never raw DONKI note text.
+  const donkiSummary = snapshot?.spaceWeather?.kidBrief;
 
-  const tip = getCrewTip(gameState, sky, donkiSummary, radLab?.peakDoseMicroGyHr);
+  const tip = getCrewTip(
+    gameState,
+    sky,
+    donkiSummary,
+    radLab && radLab.sampleCount > 0 ? radLab.peakDoseMicroGyHr : undefined
+  );
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2">
-      <button
-        type="button"
-        onClick={() => {
-          playClick(sfxEnabled);
-          setOpen(v => !v);
-        }}
-        aria-expanded={open}
-        className="min-h-[38px] px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-600/80 text-xs font-semibold text-emerald-200 transition-colors cursor-pointer whitespace-nowrap"
-      >
-        {open ? 'Hide Crew Radio' : 'Ask Crew for Advice'}
-      </button>
+    <div className="space-y-2">
+      <FlareBriefing round={gameState.round} />
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            playClick(sfxEnabled);
+            setOpen(v => !v);
+          }}
+          aria-expanded={open}
+          className="min-h-[38px] px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-600/80 text-xs font-semibold text-emerald-200 transition-colors cursor-pointer whitespace-nowrap"
+        >
+          {open ? 'Hide Crew Radio' : 'Ask Crew for Advice'}
+        </button>
 
       {open && (
         <div className="w-full rounded-xl bg-slate-950/90 border border-emerald-400/35 px-3.5 py-2.5 space-y-1.5 text-xs sm:text-sm text-slate-200">
@@ -146,6 +150,7 @@ export const CrewComms: React.FC<CrewCommsProps> = ({ gameState, sky }) => {
           )}
         </div>
       )}
+      </div>
     </div>
   );
 };
