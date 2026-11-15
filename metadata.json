@@ -1,0 +1,17 @@
+{
+  "id": "silica-station",
+  "name": "Silica Station",
+  "version": "1.0.0",
+  "description": "A lunar survival decision game",
+  "main": "server.ts",
+  "scripts": {
+    "dev": "tsx server.ts",
+    "start": "node server.ts",
+    "build": "vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf dist server.js",
+    "lint": "tsc --noEmit"
+  },
+  "author": "",
+  "license": "MIT"
+}
