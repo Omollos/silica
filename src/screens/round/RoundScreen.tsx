@@ -1,4 +1,6 @@
 import React from 'react';
+import { StationScene } from '../round/StationScene';
+import { MissionOutcomeModal } from '../round/MissionOutcomeModal';
 
 interface RoundScreenProps {
   onOpenLibrary: () => void;
@@ -16,6 +18,13 @@ export const RoundScreen: React.FC<RoundScreenProps> = ({ onOpenLibrary }) => {
             Game round implementation will go here
           </p>
         </div>
+
+        <StationScene
+          gameState={{} as any}
+          sky="day"
+          lastChoiceId={null}
+        />
+
         <div className="rounded-2xl bg-slate-900/90 border border-slate-700/80 p-6">
           <p className="text-slate-300 text-center">
             This is where the main gameplay loop will be implemented.
