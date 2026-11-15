@@ -1,53 +1,86 @@
-import React from 'react';
-import { KID_TEXT, formatKidDate, truthLabel } from '../shared/nasa/kidText';
-import { useGameStore } from '../store/gameStore';
-import { useNasaDataStore } from '../store/nasaDataStore';
-import { DetailTap } from './DetailTap';
-import { StationIcon } from './icons';
+import React, { useId, useState } from 'react';
+import { KID_TEXT } from '../shared/nasa/kidText';
 
-interface FlareBriefingProps {
-  round: number;
+interface GrownUpLinkProps {
+  href: string;
+  children: React.ReactNode;
+  className?: string;
 }
 
 /**
- * A short, real "NASA saw this flare" line for the round 6 warning and the
- * round 8 flare screen. It reads only the snapshot this run is pinned to, and
- * renders nothing at all when there is no real flare to show.
+ * Every outbound NASA/CSA link goes through this gate: a child must ask a
+ * grown-up first, and the link opens in a new tab with no opener reference.
  */
-export const FlareBriefing: React.FC<FlareBriefingProps> = ({ round }) => {
-  const snapshot = useNasaDataStore(s => s.snapshot);
-  const pinnedSnapshotId = useGameStore(s => s.pinnedSnapshotId);
+export const GrownUpLink: React.FC<GrownUpLinkProps> = ({ href, children, className }) => {
+  const inputId = useId();
+  const [open, setOpen] = useState(false);
+  const [answer, setAnswer] = useState('');
+  const [wrong, setWrong] = useState(false);
 
-  if (round !== 6 && round !== 8) return null;
-  if (!snapshot || snapshot.snapshotId !== pinnedSnapshotId) return null;
-
-  const flare = snapshot.flare;
-  if (!flare) return null;
-
-  const date = formatKidDate(flare.peakTime ?? flare.beginTime);
-  const truth = truthLabel(snapshot.source, snapshot.recordedOn);
+  const submit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (answer.trim() === '15') {
+      setOpen(false);
+      setAnswer('');
+      setWrong(false);
+      window.open(href, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    setWrong(true);
+  };
 
   return (
-    <div className="rounded-xl bg-slate-950/85 border border-amber-400/40 px-3 py-2 space-y-1">
-      <div className="flex flex-wrap items-center gap-2 text-xs">
-        <span className="text-amber-300 shrink-0" aria-hidden="true">
-          <StationIcon name="sun" className="w-4 h-4" />
-        </span>
-        <span className="font-bold text-amber-200">{KID_TEXT.flare.label}</span>
-        <span className="px-1.5 py-0.5 rounded-md bg-amber-400/20 border border-amber-300/50 font-mono font-bold text-amber-100 tabular-nums">
-          {KID_TEXT.flare.badge.replace('{classLabel}', flare.classLabel)}
-        </span>
-        {date && <span className="text-slate-400">{date}</span>}
-      </div>
-      <p className="text-xs sm:text-sm text-slate-100 leading-snug">{flare.kid.short}</p>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        {truth ? (
-          <span className="text-[11px] text-slate-400">{truth}</span>
-        ) : (
-          <span />
-        )}
-        <DetailTap promptLabel="Why?" detailText={flare.kid.detail} />
-      </div>
-    </div>
+    <span className="inline-flex flex-col gap-1.5">
+      <button
+        type="button"
+        onClick={() => {
+          setOpen(value => !value);
+          setWrong(false);
+        }}
+        aria-expanded={open}
+        className={className}
+      >
+        {children}
+      </button>
+
+      {open && (
+        <form
+          onSubmit={submit}
+          className="rounded-lg bg-slate-950 border border-slate-700 px-2.5 py-2 flex flex-wrap items-center gap-2 text-xs"
+        >
+          <label htmlFor={inputId} className="font-semibold text-slate-200">
+            {KID_TEXT.grownUps.prompt}
+          </label>
+          <input
+            id={inputId}
+            value={answer}
+            onChange={event => setAnswer(event.target.value)}
+            inputMode="numeric"
+            autoComplete="off"
+            className="w-14 min-h-[32px] rounded-md bg-slate-900 border border-slate-600 px-2 text-white text-center tabular-nums"
+          />
+          <button
+            type="submit"
+            className="min-h-[32px] px-2.5 rounded-md bg-sky-400 text-slate-950 font-bold cursor-pointer"
+          >
+            {KID_TEXT.grownUps.check}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              setWrong(false);
+              setAnswer('');
+            }}
+            className="min-h-[32px] px-2 rounded-md bg-slate-800 border border-slate-600 text-slate-200 font-semibold cursor-pointer"
+          >
+            {KID_TEXT.grownUps.cancel}
+          </button>
+          {wrong && (
+            <span className="text-amber-200 font-semibold">{KID_TEXT.grownUps.wrong}</span>
+          )}
+        </form>
+      )}
+    </span>
   );
 };
